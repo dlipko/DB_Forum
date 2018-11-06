@@ -1,4 +1,4 @@
-export default class Votes {
+class Votes {
     constructor({nickname,
         thread,
         voice,
@@ -20,3 +20,5 @@ export default class Votes {
         return voice;
     }
 }
+
+module.exports = Votes;

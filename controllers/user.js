@@ -1,7 +1,7 @@
-import User from '../models/user';
-import query from '../db/query';
+const User = require('../models/user');
+const query = require('../db/query');
 
-export default class UserController {
+class UserController {
   constructor() {}
 
   async createUser(nickname, fullname, email, about) {
@@ -43,3 +43,5 @@ export default class UserController {
     return answer.rows[0].nickname;
   }
 }
+
+module.exports = UserController;

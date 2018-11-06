@@ -1,4 +1,4 @@
-export default class Forum {
+class Forum {
     constructor({
         slug,
         title,
@@ -43,3 +43,5 @@ export default class Forum {
         }
     }
 }
+
+module.exports = Forum;

@@ -1,4 +1,4 @@
-export default class User {
+class User {
     constructor({
         nickname,
         fullname,
@@ -41,3 +41,5 @@ export default class User {
         }
     }
 }
+
+module.exports = User;

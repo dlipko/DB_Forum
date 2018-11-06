@@ -1,14 +1,14 @@
-import Router from 'express-promise-router';
-import ForumController from '../controllers/forum';
-import ThreadController from '../controllers/thread';
+const Router = require('express-promise-router');
+const ForumController = require('../controllers/forum');
+const ThreadController = require('../controllers/thread');
 
-import Thread from '../models/thread';
+const Thread = require('../models/thread');
 
 const router = new Router();
 const forumController = new ForumController();
 const threadController = new ThreadController();
 
-export default router;
+module.exports = router;
 
 const SLUG_REGISTERED = 23505;
 

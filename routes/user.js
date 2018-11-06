@@ -1,5 +1,5 @@
-import Router from 'express-promise-router';
-import UserController from '../controllers/user';
+const Router = require('express-promise-router');
+const UserController = require('../controllers/user');
 
 // create a new express-promise-router
 // this has the same API as the normal express router except
@@ -7,7 +7,7 @@ import UserController from '../controllers/user';
 const router = new Router();
 const userController = new UserController();
 
-export default router;
+module.exports =  router;
 // export our router to be mounted by the parent application
 
 const EMAIL_REGISTERED = 23505;
