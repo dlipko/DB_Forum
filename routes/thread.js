@@ -1,13 +1,13 @@
-const Router  = require('express-promise-router');
-const ThreadController = require('../controllers/thread');
-const ForumController = require('../controllers/forum');
+import Router from 'express-promise-router';
+import ThreadController from '../controllers/thread';
+import ForumController from '../controllers/forum';
 
 
 const router = new Router();
 const threadController = new ThreadController();
 const forumController = new ForumController();
 
-module.exports = router;
+export default router;
 
 const EMAIL_REGISTERED = 23505;
 

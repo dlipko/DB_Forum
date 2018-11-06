@@ -1,4 +1,4 @@
-class Post {
+export default class Post {
     constructor({ 
         author,
         created,
@@ -74,6 +74,6 @@ class Post {
     setEdited(edited) {
         isEdited = edited;
     }
-}
 
-module.exports = Post;
+
+}

@@ -8,7 +8,7 @@ const pool = new Pool({
     port: 5432,
 })
 
-module.exports =  (text, params) => {
+export default (text, params) => {
         return pool.query(text, params);
 }
   

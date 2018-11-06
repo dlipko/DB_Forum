@@ -1,7 +1,7 @@
-const Post = require('../models/post');
-const query = require('../db/query');
+import Post from '../models/post';
+import query from '../db/query';
 
-class PostController {
+export default class PostController {
   constructor() {}
 
   async createPosts(posts, thread, forum) {
@@ -52,5 +52,3 @@ class PostController {
   }
   */
 }
-
-module.exports = PostController;

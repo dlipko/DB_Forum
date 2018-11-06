@@ -1,4 +1,4 @@
-class Thread {
+export default class User {
     constructor({
         author,
         created,
@@ -55,5 +55,3 @@ class Thread {
         return slug;
     }
 }
-
-module.exports = Thread;

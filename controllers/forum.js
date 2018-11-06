@@ -1,11 +1,11 @@
-const Forum = require('../models/forum');
-const Thread = require('../models/thread');
-const query = require('../db/query');
-const UserController = require('../controllers/user');
+import Forum from '../models/forum';
+import Thread from '../models/thread';
+import query from '../db/query';
+import UserController from '../controllers/user';
 
 const userController = new UserController();
 
-class ForumController {
+export default class ForumController {
   constructor() {}
 
   async createForum(slug, title, user) {
@@ -64,6 +64,6 @@ class ForumController {
     const newThreads = answer.rows.map(thread => new Thread(thread))
     return newThreads;
   }
-}
 
-module.exports = ForumController;
+
+}

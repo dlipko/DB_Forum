@@ -1,13 +1,12 @@
-const user  = require('./user');
-const forum = require('./forum');
-const thread = require('./thread');
+import user from './user';
+import forum from './forum';
+import thread from './thread';
 /*
-const post require('./post';
-const service require('./service'; */
+import post from './post';
+import service from './service'; */
 
-module.exports = query;
 
-function query(app) {
+export default function query(app) {
   app.use('/api/user', user);
   app.use('/api/forum', forum);
   // app.use('/api/thread', thread);
@@ -16,9 +15,6 @@ function query(app) {
   app.use('service', service);
    */
 }
-
-
-
 
 
 
