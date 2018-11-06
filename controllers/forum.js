@@ -1,11 +1,11 @@
-import Forum from '../models/forum';
-import Thread from '../models/thread';
-import query from '../db/query';
-import UserController from '../controllers/user';
+const Forum = require('../models/forum');
+const Thread = require('../models/thread');
+const query = require('../db/query');
+const UserController = require('../controllers/user');
 
 const userController = new UserController();
 
-export default class ForumController {
+module.exports = class ForumController {
   constructor() {}
 
   async createForum(slug, title, user) {
@@ -13,7 +13,6 @@ export default class ForumController {
     const sqlQuery = `INSERT INTO forums (slug, title, \"user\")
       VALUES ($1, $2, (SELECT nickname FROM users WHERE lower(nickname) = lower($3)))`;
     const answer = await query(sqlQuery, [slug, title, user]);
-    console.log('forum insert', answer);
     return new Forum({
       slug,
       title,
@@ -60,7 +59,6 @@ export default class ForumController {
 
     const answer = await query(sqlQuery, [slug, limit]);
 
-    console.log(answer);
     const newThreads = answer.rows.map(thread => new Thread(thread))
     return newThreads;
   }

@@ -1,9 +1,9 @@
-import query from './query';
-import fs from'fs';
+const query = require('./query');
+const fs = require('fs');
 
 const sql = fs.readFileSync('init.sql').toString();
 
-export default () => {
+module.exports = () => {
         query(sql, [], (err, res) => {
         if (err) {
             console.log('db init fail', err);

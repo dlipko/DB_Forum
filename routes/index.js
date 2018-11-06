@@ -1,12 +1,13 @@
-import user from './user';
-import forum from './forum';
-import thread from './thread';
+const user = require('./user');
+const forum = require('./forum');
+const thread = require('./thread');
 /*
-import post from './post';
-import service from './service'; */
+const post = require('./post');
+const service = require('./service'); 
+*/
 
 
-export default function query(app) {
+module.exports = function query(app) {
   app.use('/api/user', user);
   app.use('/api/forum', forum);
   // app.use('/api/thread', thread);

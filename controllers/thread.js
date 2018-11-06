@@ -1,7 +1,7 @@
-import Thread from '../models/thread';
-import query from '../db/query';
+const Thread = require('../models/thread');
+const query = require('../db/query');
 
-export default class ThreadController {
+module.exports = class ThreadController {
   constructor() {}
 
   async createThread(author, created, forum, message, slug, title) {

@@ -1,4 +1,4 @@
-export default class Post {
+module.exports = class Post {
     constructor({ 
         author,
         created,

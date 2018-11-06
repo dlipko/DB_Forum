@@ -1,4 +1,4 @@
-export default class User {
+module.exports = class Thread {
     constructor({
         author,
         created,

@@ -1,4 +1,4 @@
-export default class Votes {
+module.exports = class Votes {
     constructor({nickname,
         thread,
         voice,

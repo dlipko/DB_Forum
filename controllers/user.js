@@ -1,7 +1,7 @@
-import User from '../models/user';
-import query from '../db/query';
+const User = require('../models/user');
+const query = require('../db/query');
 
-export default class UserController {
+module.exports = class UserController {
   constructor() {}
 
   async createUser(nickname, fullname, email, about) {
@@ -33,7 +33,6 @@ export default class UserController {
     WHERE lower($4) = lower(nickname)
     RETURNING *`; 
     const answer = await query(sqlQuery, [fullname, email, about, nickname]);
-    // console.log(answer);
     return new User(answer.rows[0]);
   }
 

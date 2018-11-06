@@ -1,14 +1,14 @@
-import Router from 'express-promise-router';
-import ForumController from '../controllers/forum';
-import ThreadController from '../controllers/thread';
+const Router = require('express-promise-router');
+const ForumController = require('../controllers/forum');
+const ThreadController = require('../controllers/thread');
 
-import Thread from '../models/thread';
+const Thread = require('../models/thread');
 
 const router = new Router();
 const forumController = new ForumController();
 const threadController = new ThreadController();
 
-export default router;
+module.exports = router;
 
 const SLUG_REGISTERED = 23505;
 
@@ -17,7 +17,6 @@ router.post('/create', async (req, res) => {
     const forum = await forumController.createForum(req.body.slug, req.body.title, req.body.user);
     return res.status(201).json(forum);
   } catch (error) {
-    console.log(error);
     if (error.code == SLUG_REGISTERED) {
       const forum = await forumController.findForumBySlug(req.body.slug);
       return res.status(409).json(forum);
@@ -28,37 +27,33 @@ router.post('/create', async (req, res) => {
   }
 })
 
-router.post('/:slug/create', async (req, res) => {
+router.post('/:forumSlug/create', async (req, res) => {
   let {
-    slug
+    forumSlug
   } = req.params;
 
-  if (req.body.slug)
-    slug = req.body.slug;
-  
-    console.log(slug);
+  if (req.body.forum)
+    forumSlug = req.body.forum;
 
-    console.log('/:slug/create');
   try {
     const thread = await threadController.createThread(
       req.body.author,
       req.body.created,
-      req.body.forum,
+      forumSlug,
       req.body.message,
-      slug,
+      req.body.slug,
       req.body.title);
     return res.status(201).json(thread);
   } catch (error) {
     console.log(error);
-    const thread = new Thread(req.body.author,
-      req.body.created,
-      req.body.forum,
-      req.body.message,
-      slug,
-      req.body.title,
-      );
-      console.log(thread);
-    return res.status(409).json(thread);
+    if (error.code == 23502)  {// null value in column "forum" violates not-null constraint
+    return res.status(404).json({
+      "message": `Can't find thread author by nickname: ${req.body.author}`
+    });
+    } else {
+      const thread = await threadController.findThreadBySlug(req.body.slug);
+      return res.status(409).json(thread);
+    }
   }
 })
 
@@ -88,7 +83,6 @@ router.get('/:slug/threads', async (req, res) => {
     desc
   } = req.query;
 
-  console.log(limit, since, desc);
 
   const forum = await forumController.findForumBySlug(slug);
   if (forum) {
@@ -104,7 +98,6 @@ router.get('/:slug/threads', async (req, res) => {
   if (user) {
     return res.status(200).json(user);
   } else {
-    console.log(error);
     return res.status(404).json({
       "message": `Can't find forum with slug ${slug}`
     });

@@ -1,4 +1,4 @@
-export default class Forum {
+module.exports = class Forum {
     constructor({
         slug,
         title,
