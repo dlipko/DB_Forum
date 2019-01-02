@@ -7,20 +7,21 @@ class VoteController {
 
   async createVote(nickname, threadIdOrSlug, voise) {
       let sqlQuery;
-      const parse = parseInt(threadIdOrSlug);
-    if (parse) {
-        threadIdOrSlug = parse;
-        sqlQuery = `INSERT INTO votes (nickname, thread_id, voice) VALUES ($1, $2, $3)
-        ON CONFLICT (nickname, thread_id) DO UPDATE SET voice = $3;`;
+    if (/^[0-9]*$/i.test(threadIdOrSlug)) {
+        threadIdOrSlug = parseInt(threadIdOrSlug, 10);
+        console.log('THREADID', threadIdOrSlug);
+        sqlQuery = `INSERT INTO votes (nickname, thread_id, voice) VALUES ($1, $2, $3)`;
+        // ON CONFLICT (nickname, thread_id) DO UPDATE SET voice = $3;`;
     } else {
         sqlQuery = `INSERT INTO votes (nickname, thread_id, voice)
-            VALUES ($1, (SELECT id FROM threads WHERE slug = $2), $3);`;
-    //   ON CONFLICT DO UPDATE SET voice = $3 WHERE votes.thread_id = (SELECT id FROM threads WHERE slug = $2) AND votes.nickname = $1;`;
+            VALUES ($1, (SELECT id FROM threads WHERE slug = $2), $3)
+            ON CONFLICT (nickname, thread_id) DO UPDATE SET voice = $3;`;
     }
-    
-    
+
     const answer = await query(sqlQuery, [nickname, threadIdOrSlug, voise]);
-    console.log('PARAMS', [nickname, threadIdOrSlug, voise]);
+
+    console.log(answer);
+
     const thread = /^[0-9]*$/i.test(threadIdOrSlug) ? await threadController.findThreadById(threadIdOrSlug) :
   await threadController.findThreadBySlug(threadIdOrSlug);
 

@@ -42,8 +42,7 @@ router.post('/:slugOrId/vote', async (req, res) => {
     const vote = await voteController.createVote(req.body.nickname, slugOrId, req.body.voice);
     return res.status(200).json(vote);
   } catch (error) {
-    // const users = await userController.findUsersByNicknameOrEmail(nickname, req.body.email);
-    console.log(error);
+    console.log('vote', error);
     return res.status(401).json([]);
   }
 })
