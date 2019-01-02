@@ -20,7 +20,13 @@ router.post('/:slugOrId/create', async (req, res) => {
 
   try {
     const posts = await postController.createPosts(req.body, thread);
+    if (posts.length) {
     return res.status(201).json(posts);
+    } else {
+      return res.status(404).json({
+        message: `Can't find post thread by id: ${slugOrId}`,
+    });
+    }
   } catch (error) {
     return res.status(404).json({
         message: `Can't find post author by nickname:`,
