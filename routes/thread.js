@@ -71,13 +71,13 @@ router.post('/:slugOrId/details', async (req, res) => {
     slugOrId
   } = req.params;
 
-  if (req.body.message || req.body.message) {
+  if (req.body.message || req.body.title) {
     try {
         const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.updateById(slugOrId, req.body.message, req.body.title) :
           await threadController.updateBySlug(slugOrId, req.body.message, req.body.title);
-        console.log(thread);
         return res.status(200).json(thread);
       } catch (error) {
+        console.log(error);
         return res.status(404).json({
         message: `Can't find thread by slug: ${slugOrId}`,
       });
@@ -85,8 +85,14 @@ router.post('/:slugOrId/details', async (req, res) => {
   } else {
     try {
       const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
-    await threadController.findThreadBySlug(slugOrId);
-      return res.status(200).json(thread);
+        await threadController.findThreadBySlug(slugOrId);
+      if (thread) {
+        return res.status(200).json(thread);
+      } else {
+        return res.status(404).json({
+          message: `Can't find thread by slug: ${slugOrId}`,
+        })
+      }
     } catch {
       return res.status(404).json({
         message: `Can't find thread by slug: ${slugOrId}`,

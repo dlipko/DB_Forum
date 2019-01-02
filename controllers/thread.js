@@ -58,13 +58,27 @@ class ThreadController {
   } 
 
   async updateBySlug(slug, message, title) {
-    console.log('updateBySlug');
-    const sqlQuery = `UPDATE threads
-    SET "message" = $1,
-    title = $2
-    WHERE lower(slug) = lower($3)
-    RETURNING *;`;
-    const answer = await query(sqlQuery, [message, title, slug]);
+    let sqlQuery = `UPDATE threads
+    SET `;
+    let params = [];
+    if (message) {
+      if (title) {
+        sqlQuery += `"message" = $1, title = $2 WHERE lower(slug) = lower($3) RETURNING *;`;
+        params = [message, title, slug];
+      } else {
+        sqlQuery += `"message" = $1 WHERE lower(slug) = lower($2) RETURNING *;`;
+        params = [message, slug];
+      }
+    } else {
+      if (title) {
+        sqlQuery += `title = $1 WHERE lower(slug) = lower($2) RETURNING *;`;
+        params = [title, slug];
+      } else {
+        return undefined;
+      }
+    }
+
+    const answer = await query(sqlQuery, params);
     if (answer.rowCount != 0) {
       return new Thread(answer.rows[0]);
     }
@@ -74,14 +88,27 @@ class ThreadController {
   }
 
   async updateById(id, message, title) {
-    console.log('updateByID');
-    const sqlQuery = `UPDATE threads
-    SET "message" = $1,
-    title = $2
-    WHERE id = $3
-    RETURNING *;`;
-    const answer = await query(sqlQuery, [message, title, id]);
-    console.log(answer);
+    let sqlQuery = `UPDATE threads
+    SET `;
+    let params = [];
+    if (message) {
+      if (title) {
+        sqlQuery += `"message" = $1, title = $2 WHERE id = $3 RETURNING *;`;
+        params = [message, title, id];
+      } else {
+        sqlQuery += `"message" = $1 WHERE id = $2 RETURNING *;`;
+        params = [message, id];
+      }
+    } else {
+      if (title) {
+        sqlQuery += `title = $1 WHERE id = $2 RETURNING *;`;
+        params = [title, id];
+      } else {
+        return undefined;
+      }
+    }
+
+    const answer = await query(sqlQuery, params);
     if (answer.rowCount != 0) {
       return new Thread(answer.rows[0]);
     }
