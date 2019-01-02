@@ -75,7 +75,7 @@ class PostController {
 
   async updateById(id, message) {
     const sqlQuery = `UPDATE posts
-    SET "message" = $1 WHERE id = $2 RETURNING *;`;
+    SET "message" = $1, is_edited = TRUE WHERE id = $2 RETURNING *;`;
 
     const answer = await query(sqlQuery, [message, id]);
     console.log(answer);

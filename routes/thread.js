@@ -18,8 +18,6 @@ router.post('/:slugOrId/create', async (req, res) => {
   const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
   await threadController.findThreadBySlug(slugOrId);
 
-
-  console.log(slugOrId, req.body);
   if (!req.body.length) {
     return res.status(201).json([]);
   }
