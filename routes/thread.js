@@ -18,17 +18,13 @@ router.post('/:slugOrId/create', async (req, res) => {
   const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
   await threadController.findThreadBySlug(slugOrId);
 
-  // console.log('thread', thread);
-  // console.log('req.body', req.body);
-
   try {
     const posts = await postController.createPosts(req.body, thread);
-    // console.log('POSTS', posts);
     return res.status(201).json(posts);
   } catch (error) {
-    // const users = await userController.findUsersByNicknameOrEmail(nickname, req.body.email);
-    // console.log(error);
-    return res.status(401).json([]);
+    return res.status(404).json({
+        message: `Can't find post author by nickname:`,
+    });
   }
 })
 
