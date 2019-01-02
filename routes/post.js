@@ -9,16 +9,15 @@ const router = new Router();
 module.exports = router;
 // export our router to be mounted by the parent application
 
-// router.post('/:nickname/create', async (req, res) => {
-//   const {
-//     nickname
-//   } = req.params;
+router.get('/:id/details', async (req, res) => {
+  const {
+    id
+  } = req.params;
 
-//   try {
-//     const user = await userController.createUser(nickname, req.body.fullname, req.body.email, req.body.about);
-//     return res.status(201).json(user);
-//   } catch (error) {
-//     const users = await userController.findUsersByNicknameOrEmail(nickname, req.body.email);
-//     return res.status(409).json(users);
-//   }
-// })
+  try {
+    const post = await postController.findPostById(id);
+    return res.status(200).json({ post });
+  } catch (error) {
+    return res.status(404).json(users);
+  }
+})

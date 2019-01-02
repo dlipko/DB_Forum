@@ -1,4 +1,5 @@
 const Posts = require('../models/posts');
+const Post = require('../models/post');
 const query = require('../db/query');
 
 class PostController {
@@ -56,22 +57,20 @@ class PostController {
       return undefined;
     }
   }
-
-  async findThreadById(id) {
-    const sqlQuery = `SELECT t.id, t.slug, t.author, t.created, 
-    t.forum, t.message, t.title, t.votes
-    FROM threads t
-    WHERE t.id = $1`;
+*/
+  async findPostById(id) {
+    const sqlQuery = `SELECT *
+    FROM posts
+    WHERE id = $1`;
 
     const answer = await query(sqlQuery, [id]);
     if (answer.rowCount != 0) {
-      return new Thread(answer.rows[0]);
+      return new Post(answer.rows[0]);
     }
     else {
       return undefined;
     }
   }
-  */
 }
 
 module.exports = new PostController();
