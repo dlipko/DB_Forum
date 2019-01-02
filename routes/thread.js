@@ -48,6 +48,41 @@ router.post('/:slugOrId/vote', async (req, res) => {
 })
 
 
+router.get('/:slugOrId/details', async (req, res) => {
+  const {
+    slugOrId
+  } = req.params;
+
+  try {
+    const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
+    await threadController.findThreadBySlug(slugOrId);
+      return res.status(200).json(thread);
+    } catch (error) {
+      console.log('details get', error);
+      return res.status(100500).json([]);
+    }
+
+})
+
+
+
+router.post('/:slug/details', async (req, res) => {
+  const {
+    slugOrId
+  } = req.params;
+
+  try {
+      const thread = await threadController.updateBySlug(slugOrId, req.body.message, req.body.title);
+      return res.status(200).json(thread);
+    } catch (error) {
+      console.log('details post', error);
+      return res.status(401).json([]);
+    }
+
+})
+
+
+
 /*
 router.get('/:nickname/profile', async (req, res) => {
   const {

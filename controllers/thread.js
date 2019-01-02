@@ -32,6 +32,7 @@ class ThreadController {
     WHERE lower(t.slug) = lower($1)`;
 
     const answer = await query(sqlQuery, [slug]);
+    console.log('findThreadBySlug', answer);
     if (answer.rowCount != 0) {
       return new Thread(answer.rows[0]);
     }
@@ -55,6 +56,23 @@ class ThreadController {
       return undefined;
     }
   } 
+
+  async updateBySlug(slug, message, title) {
+    const sqlQuery = `UPDATE threads
+    SET "message" = COALESCE($1, "message"),
+    title = COALESCE($2, title)
+    WHERE slug = $3
+    RETURNING *`;
+
+    const answer = await query(sqlQuery, [message, title, slug]);
+    if (answer.rowCount != 0) {
+      return new Thread(answer.rows[0]);
+    }
+    else {
+      return undefined;
+    }
+
+  }
 }
 
 module.exports = new ThreadController();
