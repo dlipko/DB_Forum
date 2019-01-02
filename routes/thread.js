@@ -1,11 +1,12 @@
 const Router = require('express-promise-router');
 const ThreadController = require('../controllers/thread');
 const ForumController = require('../controllers/forum');
-
+const postController = require('../controllers/post');
 
 const router = new Router();
 const threadController = new ThreadController();
 const forumController = new ForumController();
+
 
 module.exports = router;
 
@@ -15,19 +16,22 @@ router.post('/:slugOrId/create', async (req, res) => {
   const {
     slugOrId
   } = req.params;
-/*
-  const thread = /\\d+/i.test(slugOrId) ? threadController.findThreadById(slugOrId) :
-  threadController.findThreadBySlug(slugOrId);
-  const forum = forumController.findForumByThread(thread);
+  console.log('slugOrId', slugOrId);
+  const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
+  await threadController.findThreadBySlug(slugOrId);
+
+  console.log('thread', thread);
+  console.log('req.body', req.body);
+
   try {
-    const thread = await threadController.createPosts(req.body.posts, thread, forum);
-    return res.status(201).json(thread);
+    const posts = await postController.createPosts(req.body, thread);
+    console.log('POSTS', posts);
+    return res.status(201).json(posts);
   } catch (error) {
-    
-    const users = await userController.findUsersByNicknameOrEmail(nickname, req.body.email);
+    // const users = await userController.findUsersByNicknameOrEmail(nickname, req.body.email);
+    console.log(error);
+    return res.status(401).json([]);
   }
-    */
-   return res.status(409);
 })
 
 

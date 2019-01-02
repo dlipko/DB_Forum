@@ -12,11 +12,20 @@ module.exports = class ThreadController {
     
       const params = [author, created, forum, message, slug, title];
       const answer = await query(sqlQuery, params);
-    return new Thread({author, created, forum, message, slug, title});
+
+
+      if (answer.rowCount != 0) {
+        console.log('THREAD', new Thread(answer.rows[0]));
+        return new Thread(answer.rows[0]);
+      }
+      else {
+        return undefined;
+      }
   }
 
 
   async findThreadBySlug(slug) {
+    console.log('findThreadBySlug', slug);
     const sqlQuery = `SELECT t.id, t.author, t.forum,
     t.slug, t.created, t.message, t.title, t.votes
     FROM threads t
@@ -32,6 +41,7 @@ module.exports = class ThreadController {
   }
 
   async findThreadById(id) {
+    console.log('FINDTHREADBYID', id);
     const sqlQuery = `SELECT t.id, t.slug, t.author, t.created, 
     t.forum, t.message, t.title, t.votes
     FROM threads t

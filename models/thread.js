@@ -7,6 +7,7 @@ module.exports = class Thread {
         slug,
         title,
         votes,
+        id,
     }) {
         this.author = author;
         this.created = created;
@@ -19,39 +20,39 @@ module.exports = class Thread {
         if (votes && votes != 0) { 
             this.votes = votes;
         }
-        this.id = 42;
+        this.id = parseInt(id, 10);
     }
 
 
     getId() {
-        return id;
+        return this.id;
     }
 
     getAuthor() {
-        return author;
+        return this.author;
     }
 
     getCreated() {
-        return created;
+        return this.created;
     }
 
     getForum() {
-        return forum;
+        return this.forum;
     }
 
     getMessage() {
-        return message;
+        return this.message;
     }
 
     getTitle() {
-        return title;
+        return this.title;
     }
 
     getVotes() {
-        return votes;
+        return this.votes;
     }
 
     getSlug() {
-        return slug;
+        return this.slug;
     }
 }

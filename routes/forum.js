@@ -35,6 +35,8 @@ router.post('/:forumSlug/create', async (req, res) => {
   if (req.body.forum)
     forumSlug = req.body.forum;
 
+
+    console.log('/:forumSlug/create', forumSlug);
   try {
     const thread = await threadController.createThread(
       req.body.author,
@@ -43,6 +45,7 @@ router.post('/:forumSlug/create', async (req, res) => {
       req.body.message,
       req.body.slug,
       req.body.title);
+      console.log('THREAD CREATETHREAD', thread);
     return res.status(201).json(thread);
   } catch (error) {
     console.log(error);

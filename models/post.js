@@ -5,7 +5,7 @@ module.exports = class Post {
         forum,
         message,
         thread,
-        parent,
+        parent = 0,
         isEdited,
     }) {
         this.author = author;
@@ -31,36 +31,35 @@ module.exports = class Post {
     }
 
     getId() {
-
-        return id;
+        return this.id;
     }
 
     getAuthor() {
-        return author;
+        return this.author;
     }
 
     getCreated() {
-        return created;
+        return this.created;
     }
 
     getForum() {
-        return forum;
+        return this.forum;
     }
 
     getMessage() {
-        return message;
+        return this.message;
     }
 
     getThread() {
-        return thread;
+        return this.thread;
     }
 
     getParent() {
-        return parent;
+        return this.parent;
     }
 
     getIsEdited() {
-        return isEdited;
+        return this.isEdited;
     }
 
     setCreated(created) {

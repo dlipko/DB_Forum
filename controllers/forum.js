@@ -33,6 +33,7 @@ module.exports = class ForumController {
     }
   }
 
+
   async getForumThreads(slug, limit, since, desc) {
     let sqlQuery = `SELECT t.id, t.slug, t.author,
     t.forum, t.created, t.message, t.title
