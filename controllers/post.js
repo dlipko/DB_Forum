@@ -74,16 +74,20 @@ class PostController {
 
 
   async updateById(id, message) {
-    const sqlQuery = `UPDATE posts
-    SET "message" = $1, is_edited = TRUE WHERE id = $2 RETURNING *;`;
-
-    const answer = await query(sqlQuery, [message, id]);
-    console.log(answer);
-    if (answer.rowCount != 0) {
-      return new Post(answer.rows[0]);
-    }
-    else {
-      return undefined;
+    const post = await this.findPostById(id); 
+    console.log(message !== post.message, message, post.message)
+     if (message && message !== post.message) {
+      const sqlQuery = `UPDATE posts
+      SET "message" = $1, is_edited = TRUE WHERE id = $2 RETURNING *;`;
+      const answer = await query(sqlQuery, [message, id]);;
+      if (answer.rowCount != 0) {
+        return new Post(answer.rows[0]);
+      }
+      else {
+        return undefined;
+      }
+    } else {
+      return post;
     }
   }
 

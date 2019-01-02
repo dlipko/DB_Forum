@@ -28,7 +28,6 @@ router.post('/:id/details', async (req, res) => {
       id
     } = req.params;
     
-
       try {
           const post = await postController.updateById(id, req.body.message);
             if (post) {
