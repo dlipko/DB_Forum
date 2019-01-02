@@ -3,10 +3,16 @@ module.exports = class Forum {
         slug,
         title,
         user,
+        posts,
+        threads,
     }) {
         this.title = title;
         this.user = user;
         this.slug = slug;
+        this.posts = posts;
+        this.threads = threads;
+
+        // console.log('CREATE FORUM', this);
     }
 
     getTitle() {

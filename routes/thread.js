@@ -14,20 +14,20 @@ router.post('/:slugOrId/create', async (req, res) => {
   const {
     slugOrId
   } = req.params;
-  console.log('slugOrId', slugOrId);
+  // console.log('slugOrId', slugOrId);
   const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
   await threadController.findThreadBySlug(slugOrId);
 
-  console.log('thread', thread);
-  console.log('req.body', req.body);
+  // console.log('thread', thread);
+  // console.log('req.body', req.body);
 
   try {
     const posts = await postController.createPosts(req.body, thread);
-    console.log('POSTS', posts);
+    // console.log('POSTS', posts);
     return res.status(201).json(posts);
   } catch (error) {
     // const users = await userController.findUsersByNicknameOrEmail(nickname, req.body.email);
-    console.log(error);
+    // console.log(error);
     return res.status(401).json([]);
   }
 })
@@ -42,7 +42,7 @@ router.post('/:slugOrId/vote', async (req, res) => {
     const vote = await voteController.createVote(req.body.nickname, slugOrId, req.body.voice);
     return res.status(200).json(vote);
   } catch (error) {
-    console.log('vote', error);
+    // console.log('vote', error);
     return res.status(401).json([]);
   }
 })
@@ -58,7 +58,7 @@ router.get('/:slugOrId/details', async (req, res) => {
     await threadController.findThreadBySlug(slugOrId);
       return res.status(200).json(thread);
     } catch (error) {
-      console.log('details get', error);
+      // console.log('details get', error);
       return res.status(100500).json([]);
     }
 
@@ -75,7 +75,7 @@ router.post('/:slug/details', async (req, res) => {
       const thread = await threadController.updateBySlug(slugOrId, req.body.message, req.body.title);
       return res.status(200).json(thread);
     } catch (error) {
-      console.log('details post', error);
+      // console.log('details post', error);
       return res.status(401).json([]);
     }
 

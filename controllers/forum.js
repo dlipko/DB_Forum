@@ -21,11 +21,12 @@ module.exports = class ForumController {
   }
 
   async findForumBySlug(slug) {
-    const sqlQuery = `SELECT f.id, f.title, f."user", f.slug, f.posts, f.threads
+    const sqlQuery = `SELECT *
     FROM forums f
     WHERE lower(f.slug) = lower($1)`;
 
     const answer = await query(sqlQuery, [slug]);
+    console.log(answer.rows);
     if (answer.rowCount != 0) {
       return new Forum(answer.rows[0]);
     } else {

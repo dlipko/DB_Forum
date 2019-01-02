@@ -15,7 +15,7 @@ class ThreadController {
 
 
       if (answer.rowCount != 0) {
-        console.log('THREAD', new Thread(answer.rows[0]));
+        // console.log('THREAD', new Thread(answer.rows[0]));
         return new Thread(answer.rows[0]);
       }
       else {
@@ -25,14 +25,14 @@ class ThreadController {
 
 
   async findThreadBySlug(slug) {
-    console.log('findThreadBySlug', slug);
+    // console.log('findThreadBySlug', slug);
     const sqlQuery = `SELECT t.id, t.author, t.forum,
     t.slug, t.created, t.message, t.title, t.votes
     FROM threads t
     WHERE lower(t.slug) = lower($1)`;
 
     const answer = await query(sqlQuery, [slug]);
-    console.log('findThreadBySlug', answer);
+    // console.log('findThreadBySlug', answer);
     if (answer.rowCount != 0) {
       return new Thread(answer.rows[0]);
     }
@@ -42,7 +42,7 @@ class ThreadController {
   }
 
   async findThreadById(id) {
-    console.log('FINDTHREADBYID', id);
+    // console.log('FINDTHREADBYID', id);
     const sqlQuery = `SELECT t.id, t.slug, t.author, t.created, 
     t.forum, t.message, t.title, t.votes
     FROM threads t

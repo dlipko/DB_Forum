@@ -35,7 +35,7 @@ router.post('/:forumSlug/create', async (req, res) => {
     forumSlug = req.body.forum;
 
 
-    console.log('/:forumSlug/create', forumSlug);
+    // console.log('/:forumSlug/create', forumSlug);
   try {
     const thread = await threadController.createThread(
       req.body.author,
@@ -44,10 +44,10 @@ router.post('/:forumSlug/create', async (req, res) => {
       req.body.message,
       req.body.slug,
       req.body.title);
-      console.log('THREAD CREATETHREAD', thread);
+      // console.log('THREAD CREATETHREAD', thread);
     return res.status(201).json(thread);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     if (error.code == 23502)  {// null value in column "forum" violates not-null constraint
     return res.status(404).json({
       "message": `Can't find thread author by nickname: ${req.body.author}`
@@ -63,9 +63,9 @@ router.get('/:slug/details', async (req, res) => {
   const {
     slug
   } = req.params;
-  const user = await forumController.findForumBySlug(slug);
-  if (user) {
-    return res.status(200).json(user);
+  const forum = await forumController.findForumBySlug(slug);
+  if (forum) {
+    return res.status(200).json(forum);
   } else {
     return res.status(404).json({
       "message": `Can't find forum with slug ${slug}`

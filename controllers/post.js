@@ -30,7 +30,7 @@ class PostController {
     sqlQuery += ' RETURNING *';
 
     const answer = await query(sqlQuery);
-    console.log(answer);
+    // // console.log(answer);
     if (answer.rowCount != 0) {
       return new Posts(answer.rows).posts;
     }
