@@ -1,5 +1,5 @@
 const Router = require('express-promise-router');
-const postController = require('../controllers/post');
+const voteController = require('../controllers/vote');
 
 // create a new express-promise-router
 // this has the same API as the normal express router except

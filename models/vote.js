@@ -9,14 +9,14 @@ module.exports = class Votes {
     }
 
     getNickname() {
-        return nickname;
+        return this.nickname;
     }
 
     getThread() {
-        return thread;
+        return this.thread;
     }
 
     getVoice() {
-        return voice;
+        return this.voice;
     }
 }

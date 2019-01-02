@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS users (
   fullname VARCHAR NOT NULL,
   email    VARCHAR  NOT NULL,
   about    TEXT,
-   CONSTRAINT users_pkey PRIMARY KEY (nickname)
+  CONSTRAINT users_pkey PRIMARY KEY (nickname)
 );
 
 CREATE UNIQUE INDEX index_users_on_nickname
@@ -105,32 +105,33 @@ CREATE INDEX index_posts_on_thread_id_and_path_and_id
   ON posts (thread_id, path ,id);
 
 
--- CREATE TABLE IF NOT EXISTS votes (
---   user_id   BIGINT REFERENCES users (id)   NOT NULL,
---   thread_id BIGINT REFERENCES threads (id) NOT NULL,
---   voice     INT                            NOT NULL
--- );
+CREATE TABLE IF NOT EXISTS votes (
+  nickname VARCHAR  NOT NULL REFERENCES users(nickname),
+  thread_id BIGINT REFERENCES threads (id) NOT NULL,
+  voice     SMALLINT                       NOT NULL,
+  PRIMARY KEY (nickname, thread_id)
+);
 
 
--- CREATE UNIQUE INDEX index_votes_on_user_id_and_thread_id
---   ON votes (user_id, thread_id);
+CREATE UNIQUE INDEX index_votes_on_user_id_and_thread_id
+  ON votes (nickname, thread_id);
 
 
--- CREATE FUNCTION vote_insert()
---   RETURNS TRIGGER AS '
--- BEGIN
---   UPDATE threads
---   SET
---     votes = votes + NEW.voice
---   WHERE id = NEW.thread_id;
---   RETURN NULL;
--- END;
--- ' LANGUAGE plpgsql;
+CREATE FUNCTION vote_insert()
+  RETURNS TRIGGER AS '
+BEGIN
+  UPDATE threads
+  SET
+    votes = votes + NEW.voice
+  WHERE id = NEW.thread_id;
+  RETURN NULL;
+END;
+' LANGUAGE plpgsql;
 
 
--- CREATE TRIGGER on_vote_insert
--- AFTER INSERT ON votes
--- FOR EACH ROW EXECUTE PROCEDURE vote_insert();
+CREATE TRIGGER on_vote_insert
+AFTER INSERT ON votes
+FOR EACH ROW EXECUTE PROCEDURE vote_insert();
 
 -- CREATE FUNCTION vote_update()
 --   RETURNS TRIGGER AS '

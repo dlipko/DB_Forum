@@ -1,11 +1,9 @@
 const Router = require('express-promise-router');
-const ThreadController = require('../controllers/thread');
-const ForumController = require('../controllers/forum');
+const threadController = require('../controllers/thread');
 const postController = require('../controllers/post');
+const voteController = require('../controllers/vote');
 
 const router = new Router();
-const threadController = new ThreadController();
-const forumController = new ForumController();
 
 
 module.exports = router;
@@ -27,6 +25,22 @@ router.post('/:slugOrId/create', async (req, res) => {
     const posts = await postController.createPosts(req.body, thread);
     console.log('POSTS', posts);
     return res.status(201).json(posts);
+  } catch (error) {
+    // const users = await userController.findUsersByNicknameOrEmail(nickname, req.body.email);
+    console.log(error);
+    return res.status(401).json([]);
+  }
+})
+
+
+router.post('/:slugOrId/vote', async (req, res) => {
+  const {
+    slugOrId
+  } = req.params;
+
+  try {
+    const vote = await voteController.createVote(req.body.nickname, slugOrId, req.body.voice);
+    return res.status(200).json(vote);
   } catch (error) {
     // const users = await userController.findUsersByNicknameOrEmail(nickname, req.body.email);
     console.log(error);

@@ -6,7 +6,7 @@ module.exports = class Thread {
         message,
         slug,
         title,
-        votes,
+        votes = 0,
         id,
     }) {
         this.author = author;
@@ -17,9 +17,7 @@ module.exports = class Thread {
             this.slug = slug;
         }
         this.title = title;
-        if (votes && votes != 0) { 
-            this.votes = votes;
-        }
+        this.votes = votes;
         this.id = parseInt(id, 10);
     }
 

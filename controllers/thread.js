@@ -1,7 +1,7 @@
 const Thread = require('../models/thread');
 const query = require('../db/query');
 
-module.exports = class ThreadController {
+class ThreadController {
   constructor() {}
 
   async createThread(author, created, forum, message, slug, title) {
@@ -54,6 +54,7 @@ module.exports = class ThreadController {
     else {
       return undefined;
     }
-  }
-  
+  } 
 }
+
+module.exports = new ThreadController();
