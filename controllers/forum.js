@@ -26,7 +26,6 @@ module.exports = class ForumController {
     WHERE lower(f.slug) = lower($1)`;
 
     const answer = await query(sqlQuery, [slug]);
-    console.log(answer.rows);
     if (answer.rowCount != 0) {
       return new Forum(answer.rows[0]);
     } else {

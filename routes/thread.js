@@ -66,16 +66,21 @@ router.get('/:slugOrId/details', async (req, res) => {
 
 
 
-router.post('/:slug/details', async (req, res) => {
+router.post('/:slugOrId/details', async (req, res) => {
   const {
     slugOrId
   } = req.params;
 
+    console.log('/:slug/details');
+
   try {
+    console.log('/:slug/details');
       const thread = await threadController.updateBySlug(slugOrId, req.body.message, req.body.title);
+      console.log('/:slug/details');
+      console.log(thread);
       return res.status(200).json(thread);
     } catch (error) {
-      // console.log('details post', error);
+      console.log('details thread', error);
       return res.status(401).json([]);
     }
 

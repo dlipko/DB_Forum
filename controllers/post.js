@@ -27,7 +27,7 @@ class PostController {
       });
 
     sqlQuery = sqlQuery.substring(0, sqlQuery.length - 1);
-    sqlQuery += ' RETURNING *';
+    sqlQuery += ' RETURNING *;';
 
     const answer = await query(sqlQuery);
     // // console.log(answer);

@@ -74,7 +74,7 @@ CREATE INDEX index_threads_on_forum
 CREATE UNIQUE INDEX index_threads_on_slug
   ON threads (LOWER(slug));
 
-CREATE FUNCTION thread_insert_update_forums()
+CREATE OR REPLACE FUNCTION thread_insert_update_forums()
   RETURNS TRIGGER AS '
 BEGIN
   UPDATE forums
@@ -122,7 +122,7 @@ CREATE INDEX index_posts_on_thread_id_and_path_and_id
   ON posts (thread_id, path ,id);
 
 
-CREATE FUNCTION post_insert_update_forums()
+CREATE OR REPLACE FUNCTION post_insert_update_forums()
   RETURNS TRIGGER AS '
 BEGIN
   UPDATE forums

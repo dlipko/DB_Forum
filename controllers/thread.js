@@ -58,13 +58,15 @@ class ThreadController {
   } 
 
   async updateBySlug(slug, message, title) {
+    console.log('updateBySlug');
     const sqlQuery = `UPDATE threads
-    SET "message" = COALESCE($1, "message"),
-    title = COALESCE($2, title)
-    WHERE slug = $3
-    RETURNING *`;
-
+    SET "message" = $1,
+    title = $2
+    WHERE lower(slug) = lower($3)
+    RETURNING *;`;
+    console.log('updateBySlug',  [message, title, slug]);
     const answer = await query(sqlQuery, [message, title, slug]);
+    console.log(answer);
     if (answer.rowCount != 0) {
       return new Thread(answer.rows[0]);
     }
