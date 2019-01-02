@@ -10,9 +10,7 @@ class PostController {
     let sqlQuery = `INSERT INTO posts 
     (author, forum, is_edited, message, parent, thread_id)
     VALUES `;
-    console.log('POSTS', posts);
       posts.forEach((post) => {
-        console.log('POST', post);
         let parent;
         if (!post.parent) {
           post.parent = 0;
@@ -23,11 +21,12 @@ class PostController {
 
         sqlQuery += `((SELECT u.nickname FROM users u WHERE lower(u.nickname) = lower('${post.author}')),
         (SELECT f.slug FROM forums f WHERE lower(f.slug) = lower('${thread.getForum()}')), true, '${post.message}', 
-        ${post.parent}, ${thread.getId()})`;
+        ${post.parent}, ${thread.getId()}),`;
       
-        const params = [post.author, created, thread.getForum(), post.message, post.parent, thread.getId()];
+        // const params = [post.author, created, thread.getForum(), post.message, post.parent, thread.getId()];
       });
 
+    sqlQuery = sqlQuery.substring(0, sqlQuery.length - 1);
     sqlQuery += ' RETURNING *';
 
     const answer = await query(sqlQuery);

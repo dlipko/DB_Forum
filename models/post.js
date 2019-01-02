@@ -7,6 +7,7 @@ module.exports = class Post {
         thread,
         isEdited,
         id,
+        parent,
         thread_id,
     }) {
         this.id = parseInt(id, 10);
@@ -16,6 +17,7 @@ module.exports = class Post {
         this.message = message;
         this.thread = thread;
         this.isEdited = isEdited;
+        this.parent = parseInt(parent, 10),
         this.thread = parseInt(thread_id, 10);
     }
 
