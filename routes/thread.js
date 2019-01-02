@@ -42,8 +42,9 @@ router.post('/:slugOrId/vote', async (req, res) => {
     const vote = await voteController.createVote(req.body.nickname, slugOrId, req.body.voice);
     return res.status(200).json(vote);
   } catch (error) {
-    // console.log('vote', error);
-    return res.status(401).json([]);
+    return res.status(404).json({
+      message: `Can't find user by nickname: ${req.body.nickname}`,
+    });
   }
 })
 
