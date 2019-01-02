@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS posts (
   -- path      BIGINT []                      NOT NULL,
   path      BIGINT [],
   rootParent BIGINT DEFAULT 0,
-  thread_id BIGINT REFERENCES threads (id) NOT NULL
+  thread_id BIGINT NOT NULL
 );
 
 CREATE INDEX index_posts_on_thread_id_and_id

@@ -1,4 +1,4 @@
-const Post = require('../models/post');
+const Posts = require('../models/posts');
 const query = require('../db/query');
 
 class PostController {
@@ -23,18 +23,17 @@ class PostController {
 
         sqlQuery += `((SELECT u.nickname FROM users u WHERE lower(u.nickname) = lower('${post.author}')),
         (SELECT f.slug FROM forums f WHERE lower(f.slug) = lower('${thread.getForum()}')), true, '${post.message}', 
-        ${post.parent}, ${thread.getId()});`;
+        ${post.parent}, ${thread.getId()})`;
       
         const params = [post.author, created, thread.getForum(), post.message, post.parent, thread.getId()];
-        console.log('PARAMS', params);
       });
 
-    console.log('sqlQuery', sqlQuery);
+    sqlQuery += ' RETURNING *';
 
     const answer = await query(sqlQuery);
     console.log(answer);
     if (answer.rowCount != 0) {
-      return answer.rows[0];
+      return new Posts(answer.rows).posts;
     }
     else {
       return undefined;
