@@ -10,8 +10,8 @@ class VoteController {
       const parse = parseInt(threadIdOrSlug);
     if (parse) {
         threadIdOrSlug = parse;
-        sqlQuery = `INSERT INTO votes (nickname, thread_id, voice) VALUES ($1, $2, $3);`;
-    //   ON CONFLICT DO UPDATE SET voice = $3 WHERE votes.thread_id = (SELECT id FROM threads WHERE slug = $2) AND votes.nickname = $1;`;
+        sqlQuery = `INSERT INTO votes (nickname, thread_id, voice) VALUES ($1, $2, $3)
+        ON CONFLICT (nickname, thread_id) DO UPDATE SET voice = $3;`;
     } else {
         sqlQuery = `INSERT INTO votes (nickname, thread_id, voice)
             VALUES ($1, (SELECT id FROM threads WHERE slug = $2), $3);`;
