@@ -138,9 +138,24 @@ CREATE TRIGGER on_post_insert_update_forums
 AFTER INSERT ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_insert_update_forums();
 
+DROP TRIGGER IF EXISTS on_post_update ON posts;
 
+DROP FUNCTION IF EXISTS post_update();
 
+CREATE  FUNCTION post_update()
+  RETURNS TRIGGER AS '
+BEGIN
+  UPDATE posts
+  SET
+    is_edited = TRUE
+  WHERE OLD.id = NEW.id;
+  RETURN NULL;
+END;
+' LANGUAGE plpgsql;
 
+CREATE TRIGGER on_post_update
+AFTER UPDATE ON posts
+FOR EACH ROW EXECUTE PROCEDURE post_update();
 
 
 CREATE TABLE IF NOT EXISTS votes (

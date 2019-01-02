@@ -21,7 +21,7 @@ class PostController {
         // (SELECT id FROM posts WHERE id = ${post.parent}), ${thread.getId()});`;
 
         sqlQuery += `((SELECT u.nickname FROM users u WHERE lower(u.nickname) = lower('${post.author}')),
-        (SELECT f.slug FROM forums f WHERE lower(f.slug) = lower('${thread.getForum()}')), true, '${post.message}', 
+        (SELECT f.slug FROM forums f WHERE lower(f.slug) = lower('${thread.getForum()}')), FALSE, '${post.message}', 
         ${post.parent}, ${thread.getId()}),`;
       
         // const params = [post.author, created, thread.getForum(), post.message, post.parent, thread.getId()];
@@ -71,6 +71,23 @@ class PostController {
       return undefined;
     }
   }
+
+
+  async updateById(id, message) {
+    const sqlQuery = `UPDATE posts
+    SET "message" = $1 WHERE id = $2 RETURNING *;`;
+
+    const answer = await query(sqlQuery, [message, id]);
+    console.log(answer);
+    if (answer.rowCount != 0) {
+      return new Post(answer.rows[0]);
+    }
+    else {
+      return undefined;
+    }
+  }
+
+
 }
 
 module.exports = new PostController();

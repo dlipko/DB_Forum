@@ -18,6 +18,30 @@ router.get('/:id/details', async (req, res) => {
     const post = await postController.findPostById(id);
     return res.status(200).json({ post });
   } catch (error) {
-    return res.status(404).json(users);
+    return res.status(409).json(users);
   }
 })
+
+
+router.post('/:id/details', async (req, res) => {
+    const {
+      id
+    } = req.params;
+    
+
+      try {
+          const post = await postController.updateById(id, req.body.message);
+            if (post) {
+              return res.status(200).json(post);
+            } else {
+              return res.status(404).json({
+                message: `Can't find thread by slug: ${id}`,
+              });
+            }
+        } catch (error) {
+            console.log(error);
+          return res.status(404).json({
+          message: `Can't find thread by slug: ${id}`,
+        });
+      }
+  });
