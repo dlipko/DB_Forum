@@ -71,12 +71,9 @@ router.post('/:slugOrId/details', async (req, res) => {
     slugOrId
   } = req.params;
 
-    console.log('/:slug/details');
-
   try {
-    console.log('/:slug/details');
-      const thread = await threadController.updateBySlug(slugOrId, req.body.message, req.body.title);
-      console.log('/:slug/details');
+      const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.updateById(slugOrId, req.body.message, req.body.title) :
+        await threadController.updateBySlug(slugOrId, req.body.message, req.body.title);
       console.log(thread);
       return res.status(200).json(thread);
     } catch (error) {

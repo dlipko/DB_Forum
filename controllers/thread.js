@@ -64,8 +64,23 @@ class ThreadController {
     title = $2
     WHERE lower(slug) = lower($3)
     RETURNING *;`;
-    console.log('updateBySlug',  [message, title, slug]);
     const answer = await query(sqlQuery, [message, title, slug]);
+    if (answer.rowCount != 0) {
+      return new Thread(answer.rows[0]);
+    }
+    else {
+      return undefined;
+    }
+  }
+
+  async updateById(id, message, title) {
+    console.log('updateByID');
+    const sqlQuery = `UPDATE threads
+    SET "message" = $1,
+    title = $2
+    WHERE id = $3
+    RETURNING *;`;
+    const answer = await query(sqlQuery, [message, title, id]);
     console.log(answer);
     if (answer.rowCount != 0) {
       return new Thread(answer.rows[0]);
@@ -73,8 +88,8 @@ class ThreadController {
     else {
       return undefined;
     }
-
   }
+
 }
 
 module.exports = new ThreadController();
