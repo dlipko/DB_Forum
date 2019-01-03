@@ -98,7 +98,10 @@ class PostController {
     return parseInt(answer.rows[0].count, 10);
   }
 
-
+  async clear() {
+    const sqlQuery = `TRUNCATE TABLE posts CASCADE;`
+    await query(sqlQuery, []);
+  }
 }
 
 module.exports = new PostController();

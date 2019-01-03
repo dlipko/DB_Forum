@@ -49,6 +49,10 @@ class UserController {
     return parseInt(answer.rows[0].count, 10);
   }
 
+  async clear() {
+    const sqlQuery = `TRUNCATE TABLE users CASCADE;`
+    await query(sqlQuery, []);
+  }
 }
 
 module.exports = new UserController();
