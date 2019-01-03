@@ -17,7 +17,7 @@ router.post('/:slugOrId/create', async (req, res) => {
   const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
   await threadController.findThreadBySlug(slugOrId);
 
-  console.log('slugOrId', slugOrId, thread);
+  // console.log('slugOrId', slugOrId, thread);
   if (!thread) {
     return res.status(404).json({
       message: `Can't find post thread by id: ${slugOrId}`,

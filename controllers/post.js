@@ -75,8 +75,8 @@ class PostController {
 
   async updateById(id, message) {
     const post = await this.findPostById(id); 
-    console.log(message !== post.message, message, post.message)
-     if (message && message !== post.message) {
+    // console.log(message !== post.message, message, post.message)
+     if (message && post && message !== post.message) {
       const sqlQuery = `UPDATE posts
       SET "message" = $1, is_edited = TRUE WHERE id = $2 RETURNING *;`;
       const answer = await query(sqlQuery, [message, id]);;
@@ -89,6 +89,13 @@ class PostController {
     } else {
       return post;
     }
+  }
+
+  async getStatus() {
+    const sqlQuery = `SELECT COUNT(*) count
+    FROM posts;`
+    const answer = await query(sqlQuery, []);
+    return parseInt(answer.rows[0].count, 10);
   }
 
 

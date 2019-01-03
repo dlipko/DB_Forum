@@ -1,11 +1,10 @@
 const Router = require('express-promise-router');
-const ForumController = require('../controllers/forum');
+const forumController = require('../controllers/forum');
 const threadController = require('../controllers/thread');
 
 const Thread = require('../models/thread');
 
 const router = new Router();
-const forumController = new ForumController();
 
 module.exports = router;
 

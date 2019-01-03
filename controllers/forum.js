@@ -1,11 +1,9 @@
 const Forum = require('../models/forum');
 const Thread = require('../models/thread');
 const query = require('../db/query');
-const UserController = require('../controllers/user');
+const userController = require('../controllers/user');
 
-const userController = new UserController();
-
-module.exports = class ForumController {
+class ForumController {
   constructor() {}
 
   async createForum(slug, title, user) {
@@ -38,7 +36,7 @@ module.exports = class ForumController {
     let sqlQuery = `SELECT t.id, t.slug, t.author,
     t.forum, t.created, t.message, t.title
     FROM threads t
-    WHERE lower(t.forum) = lower($1) `
+    WHERE lower(t.forum) = lower($1) `;
 
     if (since) {
       if (desc == 'true') {
@@ -64,5 +62,13 @@ module.exports = class ForumController {
     return newThreads;
   }
 
+  async getStatus() {
+    const sqlQuery = `SELECT COUNT(*) count
+    FROM forums;`
+    const answer = await query(sqlQuery, []);
+    return parseInt(answer.rows[0].count, 10);
+  }
 
 }
+
+module.exports = new ForumController();

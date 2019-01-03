@@ -1,7 +1,7 @@
 const User = require('../models/user');
 const query = require('../db/query');
 
-module.exports = class UserController {
+class UserController {
   constructor() {}
 
   async createUser(nickname, fullname, email, about) {
@@ -41,4 +41,14 @@ module.exports = class UserController {
     const answer = await query(sqlQuery, [nickname]);
     return answer.rows[0].nickname;
   }
+
+  async getStatus() {
+    const sqlQuery = `SELECT COUNT(*) count
+    FROM users;`
+    const answer = await query(sqlQuery, []);
+    return parseInt(answer.rows[0].count, 10);
+  }
+
 }
+
+module.exports = new UserController();

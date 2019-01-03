@@ -1,11 +1,10 @@
 const Router = require('express-promise-router');
-const UserController = require('../controllers/user');
+const userController = require('../controllers/user');
 
 // create a new express-promise-router
 // this has the same API as the normal express router except
 // it allows you to use async functions as route handlers
 const router = new Router();
-const userController = new UserController();
 
 module.exports = router;
 // export our router to be mounted by the parent application

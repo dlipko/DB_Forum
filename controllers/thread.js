@@ -117,6 +117,13 @@ class ThreadController {
     }
   }
 
+  async getStatus() {
+    const sqlQuery = `SELECT COUNT(*) count
+    FROM threads;`
+    const answer = await query(sqlQuery, []);
+    return parseInt(answer.rows[0].count, 10);
+  }
+
 }
 
 module.exports = new ThreadController();
