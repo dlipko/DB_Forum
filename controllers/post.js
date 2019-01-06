@@ -117,6 +117,48 @@ class PostController {
     console.log('sqlQuery', sqlQuery);
 
     const answer = await query(sqlQuery, []);
+    if (answer.rowCount != 0) {
+      return new Posts(answer.rows);
+    }
+    else {
+      return undefined;
+    }
+  }
+
+  async parentTreeSort({threadId, limit, since, desc}) {
+    let sqlQuery = `SELECT *
+    FROM posts
+    WHERE root IN (SELECT id FROM posts WHERE thread_id=${threadId} AND parent=0`;
+
+    if (since) {
+			if (desc) {
+				sqlQuery += ` AND id < (SELECT root FROM posts WHERE id=${limit})`;
+			} else {
+				sqlQuery += ` AND id > (SELECT root FROM posts WHERE id=${limit})`;
+			}
+    }
+    
+    sqlQuery += ` ORDER BY id `;
+
+		if (desc) {
+			sqlQuery += ` DESC `;
+    }
+    
+    if (limit) {
+      sqlQuery += ` LIMIT ${limit}) `;
+    }
+	
+		if (desc) {
+			sqlQuery += ` ORDER BY root DESC, path `;
+		} else {
+			sqlQuery += ` ORDER BY path `;
+		}
+
+    sqlQuery += `;`;
+
+    console.log('sqlQuery', sqlQuery);
+
+    const answer = await query(sqlQuery, []);
     console.log(answer.rows);
     if (answer.rowCount != 0) {
       return new Posts(answer.rows);

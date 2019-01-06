@@ -154,9 +154,9 @@ router.get('/:slugOrId/posts', async (req, res) => {
       case 'tree':
         posts = await postController.treeSort({threadId, limit, since, desc});
         break;
-      // case 'parent_tree':
-      //   posts = await postController.parentTreeSort({threadId, limit, since, desc});
-      //   break;
+      case 'parent_tree':
+        posts = await postController.parentTreeSort({threadId, limit, since, desc});
+        break;
       default:
       console.log('NO SORT');
       // posts = await postController.({threadId, limit, since, desc});
