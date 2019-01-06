@@ -5,7 +5,6 @@ const voteController = require('../controllers/vote');
 
 const router = new Router();
 
-
 module.exports = router;
 
 const EMAIL_REGISTERED = 23505;
@@ -17,7 +16,6 @@ router.post('/:slugOrId/create', async (req, res) => {
   const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
   await threadController.findThreadBySlug(slugOrId);
 
-  // console.log('slugOrId', slugOrId, thread);
   if (!thread) {
     return res.status(404).json({
       message: `Can't find post thread by id: ${slugOrId}`,
@@ -50,10 +48,12 @@ router.post('/:slugOrId/vote', async (req, res) => {
     slugOrId
   } = req.params;
 
+
   try {
     const vote = await voteController.createVote(req.body.nickname, slugOrId, req.body.voice);
     return res.status(200).json(vote);
   } catch (error) {
+    console.log(error);
     return res.status(404).json({
       message: `Can't find user by nickname: ${req.body.nickname}`,
     });
@@ -125,43 +125,59 @@ router.post('/:slugOrId/details', async (req, res) => {
   }
 })
 
-
-
-/*
-router.get('/:nickname/profile', async (req, res) => {
+router.get('/:slugOrId/posts', async (req, res) => {
   const {
-    nickname
+    slugOrId
   } = req.params;
 
-    const thread = await userController.findUserByNickname(nickname);
-    if (thread) {
-      return res.status(200).json(thread);
-    }
-    else {
-      return res.status(404).json({
-        "message": `Can't find thread with nickname: ${nickname} #42\n`
-      });
-    }
-})
-
-router.post('/:nickname/profile', async (req, res) => {
   const {
-    nickname
-  } = req.params;
+    limit,
+    since,
+    desc,
+    sort,
+  } = req.query;
 
-    try {
-      const thread = await userController.updateUser(nickname, req.body.fullname, req.body.email, req.body.about);
-      return res.status(200).json(thread);
+  let threadId = slugOrId;
+
+  try {
+    if (!/^[0-9]*$/i.test(slugOrId)) {
+      const thread = await threadController.findThreadBySlug(slugOrId);
+      threadId = thread.id;
     }
-    catch (error) {
-      if (error.code == EMAIL_REGISTERED) {
-        return res.status(409).json({
-          "message": `This email is already registered`
-        });
-      }
-      return res.status(404).json({
-        "message": `Can't find thread with nickname: ${nickname}`
-      });
+
+    let posts;
+    switch (sort) {
+      case 'flat': 
+        posts = await postController.flatSort({threadId, limit, since, desc});
+        break;
+      // case 'tree':
+      //   posts = await postController.treeSort({threadId, limit, since, desc});
+      //   break;
+      // case 'parent_tree':
+      //   posts = await postController.parentTreeSort({threadId, limit, since, desc});
+      //   break;
+      default:
+      console.log('NO SORT');
+      // posts = await postController.({threadId, limit, since, desc});
+      break;
     }
+    if (posts) {
+      return res.status(200).json(posts.posts);
+    } else {
+      return res.status(404).json();
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+
+
+  // if (forum) {
+  //   const threads = await forumController.getForumThreads(slug, limit, since, desc);
+  //   return res.status(200).json(threads);
+  // } else {
+  //   return res.status(404).json({
+  //     "message": `Can't find forum with slug ${slug}`
+  //   });
+  // }
 })
-*/

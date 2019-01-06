@@ -58,6 +58,37 @@ class PostController {
     }
   }
 */
+
+  async flatSort({threadId, limit, since, desc}) {
+    let sqlQuery = `SELECT *
+    FROM posts
+    WHERE thread_id = ${threadId} `;
+
+    if (since) {
+      sqlQuery += ` AND id > ${since} `;
+    }
+
+    if (desc) {
+      sqlQuery += ` ORDER BY created DESC `;
+    } else {
+      sqlQuery += ` ORDER BY  id ASC `;
+    }
+
+    if (limit) {
+      sqlQuery += ` LIMIT ${limit}`;
+    }
+
+    sqlQuery += `;`;
+    const answer = await query(sqlQuery, []);
+    console.log(answer.rows);
+    if (answer.rowCount != 0) {
+      return new Posts(answer.rows);
+    }
+    else {
+      return undefined;
+    }
+  }
+
   async findPostById(id) {
     const sqlQuery = `SELECT *
     FROM posts
