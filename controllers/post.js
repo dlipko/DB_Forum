@@ -69,9 +69,9 @@ class PostController {
     }
 
     if (desc) {
-      sqlQuery += ` ORDER BY created DESC `;
+      sqlQuery += ` ORDER BY created, id DESC `;
     } else {
-      sqlQuery += ` ORDER BY  id ASC `;
+      sqlQuery += ` ORDER BY  created, id ASC `;
     }
 
     if (limit) {
@@ -79,6 +79,43 @@ class PostController {
     }
 
     sqlQuery += `;`;
+    const answer = await query(sqlQuery, []);
+    if (answer.rowCount != 0) {
+      return new Posts(answer.rows);
+    }
+    else {
+      return undefined;
+    }
+  }
+
+  async treeSort({threadId, limit, since, desc}) {
+    let sqlQuery = `SELECT *
+    FROM posts
+    WHERE thread_id = ${threadId} `;
+
+
+    if (since) {
+			if (desc) {
+				sqlQuery += ` AND path < (SELECT path FROM posts WHERE id = ${since})`;
+			} else {
+				sqlQuery += ` AND path > (SELECT path FROM posts WHERE id = ${since})`;
+      }
+    }
+
+    sqlQuery += ` ORDER BY path `; 
+    
+    if (desc) {
+			sqlQuery += ` DESC `;
+		}
+
+    if (limit) {
+      sqlQuery += ` LIMIT ${limit}`;
+    }
+
+    sqlQuery += `;`;
+
+    console.log('sqlQuery', sqlQuery);
+
     const answer = await query(sqlQuery, []);
     console.log(answer.rows);
     if (answer.rowCount != 0) {

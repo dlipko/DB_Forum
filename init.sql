@@ -100,9 +100,8 @@ CREATE TABLE IF NOT EXISTS posts (
   is_edited BOOLEAN DEFAULT FALSE,
   message   TEXT NOT NULL,
   parent    BIGINT DEFAULT 0 NOT NULL,
-  -- path      BIGINT []                      NOT NULL,
-  path      BIGINT [],
-  rootParent BIGINT DEFAULT 0,
+  path      BIGINT []               DEFAULT ARRAY [] :: BIGINT [],
+  root BIGINT DEFAULT 0,
   thread_id BIGINT NOT NULL
 );
 
@@ -121,6 +120,8 @@ CREATE INDEX index_posts_thread_path_parent
 CREATE INDEX index_posts_on_thread_id_and_path_and_id
   ON posts (thread_id, path ,id);
 
+DROP TRIGGER IF EXISTS on_post_update ON posts;
+DROP FUNCTION IF EXISTS post_update();
 
 CREATE OR REPLACE FUNCTION post_insert_update_forums()
   RETURNS TRIGGER AS '
@@ -138,9 +139,35 @@ CREATE TRIGGER on_post_insert_update_forums
 AFTER INSERT ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_insert_update_forums();
 
-DROP TRIGGER IF EXISTS on_post_update ON posts;
 
-DROP FUNCTION IF EXISTS post_update();
+DROP TRIGGER IF EXISTS on_post_insert_update_path_root ON posts;
+DROP FUNCTION IF EXISTS post_insert_update_post_path_root();
+
+CREATE OR REPLACE FUNCTION post_insert_update_post_path_root()
+  RETURNS TRIGGER AS '
+DECLARE 
+    parent_root INTEGER;
+    parent_path BIGINT [];
+BEGIN
+  SELECT root, path INTO parent_root, parent_path
+  FROM posts 
+  WHERE id = NEW.parent;
+
+  IF NEW.parent = 0 THEN
+    NEW.root = NEW.id;
+  ELSE
+    NEW.root = NEW.parent;
+  END IF;
+
+  NEW.path = array_append(parent_path, NEW.id);
+
+  RETURN NEW;
+END;
+' LANGUAGE plpgsql;
+
+CREATE TRIGGER on_post_insert_update_path_root
+BEFORE INSERT ON posts
+FOR EACH ROW EXECUTE PROCEDURE post_insert_update_post_path_root();
 
 
 CREATE TABLE IF NOT EXISTS votes (

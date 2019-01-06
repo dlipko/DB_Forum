@@ -36,6 +36,7 @@ router.post('/:slugOrId/create', async (req, res) => {
     });
     }
   } catch (error) {
+    console.log(error);
     return res.status(404).json({
         message: `Can't find post author by nickname:`,
     });
@@ -150,9 +151,9 @@ router.get('/:slugOrId/posts', async (req, res) => {
       case 'flat': 
         posts = await postController.flatSort({threadId, limit, since, desc});
         break;
-      // case 'tree':
-      //   posts = await postController.treeSort({threadId, limit, since, desc});
-      //   break;
+      case 'tree':
+        posts = await postController.treeSort({threadId, limit, since, desc});
+        break;
       // case 'parent_tree':
       //   posts = await postController.parentTreeSort({threadId, limit, since, desc});
       //   break;
