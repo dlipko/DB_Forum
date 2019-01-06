@@ -7,9 +7,9 @@ DROP INDEX IF EXISTS index_threads_on_slug;
 DROP INDEX IF EXISTS index_posts_on_author_id;
 DROP INDEX IF EXISTS index_posts_on_forum_id;
 DROP INDEX IF EXISTS index_posts_on_parent;
-DROP INDEX IF EXISTS index_posts_on_thread_id;
+DROP INDEX IF EXISTS index_posts_on_thread;
 DROP INDEX IF EXISTS index_posts_on_path;
-DROP INDEX IF EXISTS index_votes_on_user_id_and_thread_id;
+DROP INDEX IF EXISTS index_votes_on_user_id_and_thread;
 DROP INDEX IF EXISTS index_forum_members_on_user_id;
 
 DROP TRIGGER IF EXISTS on_vote_update ON votes;
@@ -102,23 +102,23 @@ CREATE TABLE IF NOT EXISTS posts (
   parent    BIGINT DEFAULT 0 NOT NULL,
   path      BIGINT []               DEFAULT ARRAY [] :: BIGINT [],
   root BIGINT DEFAULT 0,
-  thread_id BIGINT NOT NULL
+  thread BIGINT NOT NULL
 );
 
-CREATE INDEX index_posts_on_thread_id_and_id
-  ON posts(thread_id, id);
+CREATE INDEX index_posts_on_thread_and_id
+  ON posts(thread, id);
 
 CREATE INDEX index_posts_on_parent
   ON posts (parent);
 
-CREATE INDEX index_posts_on_thread_id
-  ON posts (thread_id);
+CREATE INDEX index_posts_on_thread
+  ON posts (thread);
 
 CREATE INDEX index_posts_thread_path_parent
-  ON posts(thread_id, parent, path);
+  ON posts(thread, parent, path);
 
-CREATE INDEX index_posts_on_thread_id_and_path_and_id
-  ON posts (thread_id, path ,id);
+CREATE INDEX index_posts_on_thread_and_path_and_id
+  ON posts (thread, path ,id);
 
 DROP TRIGGER IF EXISTS on_post_update ON posts;
 DROP FUNCTION IF EXISTS post_update();
@@ -172,14 +172,14 @@ FOR EACH ROW EXECUTE PROCEDURE post_insert_update_post_path_root();
 
 CREATE TABLE IF NOT EXISTS votes (
   nickname VARCHAR  NOT NULL REFERENCES users(nickname),
-  thread_id BIGINT REFERENCES threads (id) NOT NULL,
+  thread BIGINT REFERENCES threads (id) NOT NULL,
   voice     SMALLINT                       NOT NULL,
-  PRIMARY KEY (nickname, thread_id)
+  PRIMARY KEY (nickname, thread)
 );
 
 
-CREATE UNIQUE INDEX index_votes_on_user_id_and_thread_id
-  ON votes (nickname, thread_id);
+CREATE UNIQUE INDEX index_votes_on_user_id_and_thread
+  ON votes (nickname, thread);
 
 
 CREATE FUNCTION vote_insert()
@@ -188,7 +188,7 @@ BEGIN
   UPDATE threads
   SET
     votes = votes + NEW.voice
-  WHERE id = NEW.thread_id;
+  WHERE id = NEW.thread;
   RETURN NULL;
 END;
 ' LANGUAGE plpgsql;
@@ -210,7 +210,7 @@ BEGIN
     votes = votes + CASE WHEN NEW.voice = -1
       THEN -2
                     ELSE 2 END
-  WHERE id = NEW.thread_id;
+  WHERE id = NEW.thread;
   RETURN NULL;
 END;
 ' LANGUAGE plpgsql;

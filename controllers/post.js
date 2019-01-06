@@ -9,7 +9,7 @@ class PostController {
     if (posts.length) { 
     const created = new Date().toISOString();
     let sqlQuery = `INSERT INTO posts 
-    (author, forum, is_edited, message, parent, thread_id)
+    (author, forum, is_edited, message, parent, thread)
     VALUES `;
       posts.forEach((post) => {
         let parent;
@@ -62,16 +62,16 @@ class PostController {
   async flatSort({threadId, limit, since, desc}) {
     let sqlQuery = `SELECT *
     FROM posts
-    WHERE thread_id = ${threadId} `;
+    WHERE thread = ${threadId} `;
 
     if (since) {
       sqlQuery += ` AND id > ${since} `;
     }
 
     if (desc === 'true') {
-      sqlQuery += ` ORDER BY created, id DESC `;
+      sqlQuery += ` ORDER BY id DESC `;
     } else {
-      sqlQuery += ` ORDER BY  created, id ASC `;
+      sqlQuery += ` ORDER BY id ASC `;
     }
 
     if (limit) {
@@ -92,7 +92,7 @@ class PostController {
   async treeSort({threadId, limit, since, desc}) {
     let sqlQuery = `SELECT *
     FROM posts
-    WHERE thread_id = ${threadId} `;
+    WHERE thread = ${threadId} `;
 
 
     if (since) {
@@ -129,7 +129,7 @@ class PostController {
   async parentTreeSort({threadId, limit, since, desc}) {
     let sqlQuery = `SELECT *
     FROM posts
-    WHERE root IN (SELECT id FROM posts WHERE thread_id=${threadId} AND parent=0`;
+    WHERE root IN (SELECT id FROM posts WHERE thread=${threadId} AND parent=0`;
 
     if (since) {
 			if (desc === 'true') {
