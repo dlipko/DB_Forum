@@ -68,7 +68,7 @@ class PostController {
       sqlQuery += ` AND id > ${since} `;
     }
 
-    if (desc) {
+    if (desc === 'true') {
       sqlQuery += ` ORDER BY created, id DESC `;
     } else {
       sqlQuery += ` ORDER BY  created, id ASC `;
@@ -79,6 +79,7 @@ class PostController {
     }
 
     sqlQuery += `;`;
+    console.log('sqlQuery flatSort', sqlQuery);
     const answer = await query(sqlQuery, []);
     if (answer.rowCount != 0) {
       return new Posts(answer.rows);
@@ -114,7 +115,7 @@ class PostController {
 
     sqlQuery += `;`;
 
-    console.log('sqlQuery', sqlQuery);
+    console.log('sqlQuery treeSort', sqlQuery);
 
     const answer = await query(sqlQuery, []);
     if (answer.rowCount != 0) {
@@ -156,10 +157,9 @@ class PostController {
 
     sqlQuery += `;`;
 
-    console.log('sqlQuery', sqlQuery);
+    console.log('sqlQuery parentTreeSort', sqlQuery);
 
     const answer = await query(sqlQuery, []);
-    console.log(answer.rows);
     if (answer.rowCount != 0) {
       return new Posts(answer.rows);
     }

@@ -158,9 +158,8 @@ router.get('/:slugOrId/posts', async (req, res) => {
         posts = await postController.parentTreeSort({threadId, limit, since, desc});
         break;
       default:
-      console.log('NO SORT');
-      // posts = await postController.({threadId, limit, since, desc});
-      break;
+        posts = await postController.flatSort({threadId, limit, since, desc});
+        break;
     }
     if (posts) {
       return res.status(200).json(posts.posts);
