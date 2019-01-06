@@ -156,7 +156,7 @@ BEGIN
   IF NEW.parent = 0 THEN
     NEW.root = NEW.id;
   ELSE
-    NEW.root = NEW.parent;
+    NEW.root = parent_root;
   END IF;
 
   NEW.path = array_append(parent_path, NEW.id);

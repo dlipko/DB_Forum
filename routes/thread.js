@@ -161,10 +161,11 @@ router.get('/:slugOrId/posts', async (req, res) => {
         posts = await postController.flatSort({threadId, limit, since, desc});
         break;
     }
+
     if (posts) {
       return res.status(200).json(posts.posts);
     } else {
-      return res.status(404).json();
+      return res.status(200).json([]);
     }
 
   } catch (error) {
