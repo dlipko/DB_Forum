@@ -65,7 +65,11 @@ class PostController {
     WHERE thread = ${threadId} `;
 
     if (since) {
-      sqlQuery += ` AND id > ${since} `;
+      if (desc === 'true') {
+        sqlQuery += ` AND id < ${since} `;
+      } else {
+        sqlQuery += ` AND id > ${since} `;
+      }
     }
 
     if (desc === 'true') {
@@ -133,9 +137,9 @@ class PostController {
 
     if (since) {
 			if (desc === 'true') {
-				sqlQuery += ` AND id < (SELECT root FROM posts WHERE id=${limit})`;
+				sqlQuery += ` AND id < (SELECT root FROM posts WHERE id=${since})`;
 			} else {
-				sqlQuery += ` AND id > (SELECT root FROM posts WHERE id=${limit})`;
+				sqlQuery += ` AND id > (SELECT root FROM posts WHERE id=${since})`;
 			}
     }
     
