@@ -96,7 +96,7 @@ class PostController {
 
 
     if (since) {
-			if (desc) {
+			if (desc === 'true') {
 				sqlQuery += ` AND path < (SELECT path FROM posts WHERE id = ${since})`;
 			} else {
 				sqlQuery += ` AND path > (SELECT path FROM posts WHERE id = ${since})`;
@@ -105,7 +105,7 @@ class PostController {
 
     sqlQuery += ` ORDER BY path `; 
     
-    if (desc) {
+    if (desc === 'true') {
 			sqlQuery += ` DESC `;
 		}
 
@@ -132,7 +132,7 @@ class PostController {
     WHERE root IN (SELECT id FROM posts WHERE thread_id=${threadId} AND parent=0`;
 
     if (since) {
-			if (desc) {
+			if (desc === 'true') {
 				sqlQuery += ` AND id < (SELECT root FROM posts WHERE id=${limit})`;
 			} else {
 				sqlQuery += ` AND id > (SELECT root FROM posts WHERE id=${limit})`;
@@ -141,7 +141,7 @@ class PostController {
     
     sqlQuery += ` ORDER BY id `;
 
-		if (desc) {
+		if (desc === 'true') {
 			sqlQuery += ` DESC `;
     }
     
@@ -149,7 +149,7 @@ class PostController {
       sqlQuery += ` LIMIT ${limit}) `;
     }
 	
-		if (desc) {
+		if (desc === 'true') {
 			sqlQuery += ` ORDER BY root DESC, path `;
 		} else {
 			sqlQuery += ` ORDER BY path `;
