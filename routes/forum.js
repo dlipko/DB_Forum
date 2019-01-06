@@ -1,6 +1,7 @@
 const Router = require('express-promise-router');
 const forumController = require('../controllers/forum');
 const threadController = require('../controllers/thread');
+const postController = require('../controllers/post');
 
 const Thread = require('../models/thread');
 
@@ -94,15 +95,31 @@ router.get('/:slug/threads', async (req, res) => {
       "message": `Can't find forum with slug ${slug}`
     });
   }
+})
 
-  /*
-  if (user) {
-    return res.status(200).json(user);
-  } else {
-    return res.status(404).json({
-      "message": `Can't find forum with slug ${slug}`
-    });
+router.get('/:slug/users', async (req, res) => {
+  const {
+    slug
+  } = req.params;
 
+  const {
+    limit,
+    since,
+    desc,
+  } = req.query;
 
-    */
+  try {
+    // const forum = await forumController.findForumBySlug(slug);
+    users = await postController.getUsers({slug, limit, since, desc});
+
+    if (users) {
+      return res.status(200).json(users);
+    } else {
+      return res.status(200).json([]);
+    }
+
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json([]);
+  }
 })

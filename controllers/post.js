@@ -83,7 +83,7 @@ class PostController {
     }
 
     sqlQuery += `;`;
-    console.log('sqlQuery flatSort', sqlQuery);
+    // console.log('sqlQuery flatSort', sqlQuery);
     const answer = await query(sqlQuery, []);
     if (answer.rowCount != 0) {
       return new Posts(answer.rows);
@@ -119,7 +119,7 @@ class PostController {
 
     sqlQuery += `;`;
 
-    console.log('sqlQuery treeSort', sqlQuery);
+    // console.log('sqlQuery treeSort', sqlQuery);
 
     const answer = await query(sqlQuery, []);
     if (answer.rowCount != 0) {
@@ -161,7 +161,7 @@ class PostController {
 
     sqlQuery += `;`;
 
-    console.log('sqlQuery parentTreeSort', sqlQuery);
+    // console.log('sqlQuery parentTreeSort', sqlQuery);
 
     const answer = await query(sqlQuery, []);
     if (answer.rowCount != 0) {
@@ -201,6 +201,45 @@ class PostController {
       }
     } else {
       return post;
+    }
+  }
+
+  async getUsers({ slug, limit, since, desc }) {
+    let sqlQuery = `SELECT *
+    FROM users
+    WHERE ( nickname in (SELECT DISTINCT author FROM posts WHERE lower(forum) = lower($1)`;
+
+
+    if (since) {
+			if (desc === 'true') {
+				sqlQuery += ` AND author < '${since}'`;
+			} else {
+				sqlQuery += ` AND author > '${since}'`;
+			}
+    }
+
+    sqlQuery += ' ) OR nickname IN (SELECT author FROM threads WHERE lower(forum) = lower($1)) ) ';
+    
+    sqlQuery += ` ORDER BY nickname `;
+
+		if (desc === 'true') {
+			sqlQuery += ` DESC `;
+    }
+    
+    if (limit) {
+      sqlQuery += ` LIMIT  ${limit} `;
+    }
+
+    sqlQuery += `;`;
+
+    console.log('sqlQuery getUsers', sqlQuery);
+
+    const answer = await query(sqlQuery, [slug]);
+    if (answer.rowCount != 0) {
+      return answer.rows;
+    }
+    else {
+      return undefined;
     }
   }
 

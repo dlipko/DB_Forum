@@ -54,9 +54,10 @@ router.post('/:slugOrId/vote', async (req, res) => {
     const vote = await voteController.createVote(req.body.nickname, slugOrId, req.body.voice);
     return res.status(200).json(vote);
   } catch (error) {
-    console.log(error);
+    console.log(slugOrId);
+    console.log('/:slugOrId/vote', error);
     return res.status(404).json({
-      message: `Can't find user by nickname: ${req.body.nickname}`,
+      message: `Can't find user by nickname: ${slugOrId} ${req.body.nickname}`,
     });
   }
 })
@@ -170,15 +171,6 @@ router.get('/:slugOrId/posts', async (req, res) => {
 
   } catch (error) {
     console.log(error);
+    return res.status(404).json([]);
   }
-
-
-  // if (forum) {
-  //   const threads = await forumController.getForumThreads(slug, limit, since, desc);
-  //   return res.status(200).json(threads);
-  // } else {
-  //   return res.status(404).json({
-  //     "message": `Can't find forum with slug ${slug}`
-  //   });
-  // }
 })

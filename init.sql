@@ -25,12 +25,14 @@ DROP TABLE IF EXISTS posts CASCADE;
 DROP TABLE IF EXISTS votes CASCADE;
 DROP TABLE IF EXISTS forum_members CASCADE;
 
+CREATE EXTENSION IF NOT EXISTS CITEXT;
+
 
 CREATE TABLE IF NOT EXISTS users (
-  nickname VARCHAR  NOT NULL,
-  fullname VARCHAR NOT NULL,
-  email    VARCHAR  NOT NULL,
-  about    TEXT,
+  nickname CITEXT  NOT NULL,
+  fullname CITEXT NOT NULL,
+  email    CITEXT  NOT NULL,
+  about    CITEXT,
   CONSTRAINT users_pkey PRIMARY KEY (nickname)
 );
 
@@ -44,10 +46,10 @@ CREATE UNIQUE INDEX index_users_on_email
 CREATE TABLE IF NOT EXISTS forums (
   id      BIGSERIAL PRIMARY KEY,
   posts   INT   NOT NULL DEFAULT 0,
-  slug    TEXT  NOT NULL,
+  slug    CITEXT  NOT NULL,
   threads INT   NOT NULL DEFAULT 0,
-  title   TEXT  NOT NULL,
-  "user"  TEXT  NOT NULL REFERENCES users(nickname)
+  title   CITEXT  NOT NULL,
+  "user"  CITEXT  NOT NULL REFERENCES users(nickname)
 );
 
 CREATE UNIQUE INDEX index_forum_on_slug
@@ -58,12 +60,12 @@ CREATE INDEX index_forum_on_user
 
 CREATE TABLE IF NOT EXISTS threads (
   id        BIGSERIAL PRIMARY KEY,
-  author    TEXT        NOT NULL  REFERENCES users(nickname),
+  author    CITEXT        NOT NULL  REFERENCES users(nickname),
   created   TIMESTAMPTZ NOT NULL,
-  forum     TEXT        NOT NULL,
+  forum     CITEXT        NOT NULL,
   message   TEXT        NOT NULL,
-  slug      TEXT        DEFAULT NULL UNIQUE,
-  title     TEXT        NOT NULL,
+  slug      CITEXT        DEFAULT NULL UNIQUE,
+  title     CITEXT        NOT NULL,
   votes     INT         NOT NULL DEFAULT 0
 );
 
@@ -94,11 +96,11 @@ FOR EACH ROW EXECUTE PROCEDURE thread_insert_update_forums();
 
 CREATE TABLE IF NOT EXISTS posts (
   id        BIGSERIAL PRIMARY KEY,
-  author    TEXT NOT NULL REFERENCES users(nickname),
+  author    CITEXT NOT NULL REFERENCES users(nickname),
   created   TIMESTAMPTZ  DEFAULT transaction_timestamp()  NOT NULL,
-  forum     TEXT NOT NULL,
+  forum     CITEXT NOT NULL,
   is_edited BOOLEAN DEFAULT FALSE,
-  message   TEXT NOT NULL,
+  message   CITEXT NOT NULL,
   parent    BIGINT DEFAULT 0 NOT NULL,
   path      BIGINT []               DEFAULT ARRAY [] :: BIGINT [],
   root BIGINT DEFAULT 0,
@@ -171,7 +173,7 @@ FOR EACH ROW EXECUTE PROCEDURE post_insert_update_post_path_root();
 
 
 CREATE TABLE IF NOT EXISTS votes (
-  nickname VARCHAR  NOT NULL REFERENCES users(nickname),
+  nickname CITEXT  NOT NULL REFERENCES users(nickname),
   thread BIGINT REFERENCES threads (id) NOT NULL,
   voice     SMALLINT                       NOT NULL,
   PRIMARY KEY (nickname, thread)
@@ -218,36 +220,3 @@ END;
 CREATE TRIGGER on_vote_update
 AFTER UPDATE ON votes
 FOR EACH ROW EXECUTE PROCEDURE vote_update();
-
--- CREATE TABLE IF NOT EXISTS forum_members (
---   user_id  BIGINT REFERENCES users (id),
---   forum_id BIGINT REFERENCES forums (id)
--- );
-
--- CREATE INDEX index_forum_members_on_user_id
---   ON forum_members(user_id);
-
--- CREATE INDEX index_forum_members_on_forum_id
---   ON forum_members(forum_id);
-
--- CREATE INDEX index_forum_members_on_user_id_forum_id
---   ON forum_members (user_id, forum_id);
-
-
--- CREATE OR REPLACE FUNCTION forum_members_update()
---   RETURNS TRIGGER AS '
--- BEGIN
---   INSERT INTO forum_members (user_id, forum_id) VALUES ((SELECT id FROM users WHERE lower(NEW.author) = lower(nickname)),
---                                                         (SELECT id FROM forums WHERE lower(NEW.forum) = lower(slug)));
---   RETURN NULL;
--- END;
--- ' LANGUAGE plpgsql;
-
-
--- CREATE TRIGGER on_post_insert
--- AFTER INSERT ON posts
--- FOR EACH ROW EXECUTE PROCEDURE forum_members_update();
-
--- CREATE TRIGGER on_thread_insert
--- AFTER INSERT ON threads
--- FOR EACH ROW EXECUTE PROCEDURE forum_members_update();
