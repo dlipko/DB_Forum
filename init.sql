@@ -29,11 +29,10 @@ CREATE EXTENSION IF NOT EXISTS CITEXT;
 
 
 CREATE TABLE IF NOT EXISTS users (
-  nickname CITEXT  NOT NULL,
+  nickname CITEXT  COLLATE ucs_basic NOT NULL PRIMARY KEY,
   fullname CITEXT NOT NULL,
   email    CITEXT  NOT NULL,
-  about    CITEXT,
-  CONSTRAINT users_pkey PRIMARY KEY (nickname)
+  about    TEXT
 );
 
 CREATE UNIQUE INDEX index_users_on_nickname
