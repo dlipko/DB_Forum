@@ -1,5 +1,8 @@
 const Router = require('express-promise-router');
 const postController = require('../controllers/post');
+const userController = require('../controllers/user');
+const threadController = require('../controllers/thread');
+const forumController = require('../controllers/forum');
 
 // create a new express-promise-router
 // this has the same API as the normal express router except
@@ -14,15 +17,50 @@ router.get('/:id/details', async (req, res) => {
     id
   } = req.params;
 
+  let {
+    related
+  } = req.query;
+
+  let answer = {};
   try {
     const post = await postController.findPostById(id);
+
     if (post && Object.keys(post).length != 0) {
-      return res.status(200).json({ post });
+        answer.post = post;
     } else {
       return res.status(404).json({
         message: "Can't find post with id: 2139800938"
       });
     }
+
+    if (related) {
+      related = related.split(',');
+      console.log(related);
+      for (let i = 0; i <related.length; i++) {
+        const field = related[i];
+        switch(field) {
+          case 'user':
+          answer.author = await userController.findUserByNickname(post.author);
+          console.log('author', answer);
+            break;
+          case 'thread':
+          answer.thread = await threadController.findThreadById(post.thread);
+          console.log('thread', answer);
+            break;
+          case 'forum':
+          answer.forum = await forumController.findForumBySlug(post.forum);
+          console.log('forum', answer);
+            break;
+          default:
+            break;
+        }
+      }
+    }
+
+    console.log('ANSWER', answer.author);
+    return res.status(200).json(answer);
+
+
   } catch (error) {
     console.log(error);
     return res.status(409).json({
