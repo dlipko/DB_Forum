@@ -16,9 +16,18 @@ router.get('/:id/details', async (req, res) => {
 
   try {
     const post = await postController.findPostById(id);
-    return res.status(200).json({ post });
+    if (post && Object.keys(post).length != 0) {
+      return res.status(200).json({ post });
+    } else {
+      return res.status(404).json({
+        message: "Can't find post with id: 2139800938"
+      });
+    }
   } catch (error) {
-    return res.status(409).json(users);
+    console.log(error);
+    return res.status(409).json({
+      message: 'fghjk',
+    });
   }
 })
 
@@ -38,7 +47,7 @@ router.post('/:id/details', async (req, res) => {
               });
             }
         } catch (error) {
-            console.log(error);
+            // console.log(error);
           return res.status(404).json({
           message: `Can't find thread by slug: ${id}`,
         });

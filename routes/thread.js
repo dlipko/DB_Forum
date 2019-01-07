@@ -36,8 +36,8 @@ router.post('/:slugOrId/create', async (req, res) => {
     });
     }
   } catch (error) {
-    console.log(error);
-    console.log('ERROR CODE', error.code);
+    // console.log(error);
+    // console.log('ERROR CODE', error.code);
     if (error.code === '23502') {
       return res.status(404).json({
         message: `Can't find post author by nickname:`,
@@ -60,8 +60,8 @@ router.post('/:slugOrId/vote', async (req, res) => {
     const vote = await voteController.createVote(req.body.nickname, slugOrId, req.body.voice);
     return res.status(200).json(vote);
   } catch (error) {
-    console.log(slugOrId);
-    console.log('/:slugOrId/vote', error);
+    // console.log(slugOrId);
+    // console.log('/:slugOrId/vote', error);
     return res.status(404).json({
       message: `Can't find user by nickname: ${slugOrId} ${req.body.nickname}`,
     });
@@ -180,7 +180,7 @@ router.get('/:slugOrId/posts', async (req, res) => {
     }
 
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(404).json({
       message: "Can't find thread by slug: t3v-xm1hE6sOk"
     });

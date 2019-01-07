@@ -125,7 +125,7 @@ router.get('/:slug/users', async (req, res) => {
     }
 
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(404).json({
       "message": "Can't find forum by slug: 03I9V4x1eoKo8"
     });

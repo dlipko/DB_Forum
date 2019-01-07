@@ -31,7 +31,7 @@ router.post('/clear', async (req, res) => {
         await serviceController.clear();
         return res.status(200).json();
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         return res.status(404).json({
             message: `Clear error`,
         });

@@ -231,7 +231,7 @@ class PostController {
 
     sqlQuery += `;`;
 
-    console.log('sqlQuery getUsers', sqlQuery);
+    // console.log('sqlQuery getUsers', sqlQuery);
 
     const answer = await query(sqlQuery, [slug]);
     if (answer.rowCount != 0) {
