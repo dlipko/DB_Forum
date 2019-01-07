@@ -148,10 +148,14 @@ router.get('/:slugOrId/posts', async (req, res) => {
   let threadId = slugOrId;
 
   try {
-    if (!/^[0-9]*$/i.test(slugOrId)) {
-      const thread = await threadController.findThreadBySlug(slugOrId);
-      threadId = thread.id;
+    const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
+      await threadController.findThreadBySlug(slugOrId);
+    if (!thread) {
+      return res.status(404).json({
+        message: "Can't find thread by slug: t3v-xm1hE6sOk"
+      });
     }
+    threadId = thread.id;
 
     let posts;
     switch (sort) {
@@ -177,6 +181,8 @@ router.get('/:slugOrId/posts', async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    return res.status(404).json([]);
+    return res.status(404).json({
+      message: "Can't find thread by slug: t3v-xm1hE6sOk"
+    });
   }
 })
