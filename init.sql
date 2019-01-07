@@ -141,6 +141,35 @@ AFTER INSERT ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_insert_update_forums();
 
 
+
+
+DROP TRIGGER IF EXISTS on_post_insert_update_path_root ON posts;
+DROP FUNCTION IF EXISTS post_insert_update_post_path_root();
+
+CREATE OR REPLACE FUNCTION post_insert_check_parent_forum()
+  RETURNS TRIGGER AS '
+BEGIN
+  IF NEW.parent != 0 
+  THEN
+    IF NEW.forum = (SELECT forum FROM posts WHERE id = NEW.parent) 
+    THEN
+      return NEW;
+    ELSE
+      RAISE division_by_zero;
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+' LANGUAGE plpgsql;
+
+CREATE TRIGGER on_post_insert_check_parent_forum
+BEFORE INSERT ON posts
+FOR EACH ROW EXECUTE PROCEDURE post_insert_check_parent_forum();
+
+
+
+
+
 DROP TRIGGER IF EXISTS on_post_insert_update_path_root ON posts;
 DROP FUNCTION IF EXISTS post_insert_update_post_path_root();
 

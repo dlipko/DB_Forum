@@ -36,7 +36,6 @@ class ForumController {
     FROM forums
     WHERE slug = $1;`
     const answer = await query(sqlQuery, [slug]);
-    console.log(answer);
     return answer.rowCount;
   }
 
