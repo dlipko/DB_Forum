@@ -31,6 +31,14 @@ class ForumController {
     }
   }
 
+  async isExist(slug) {
+    const sqlQuery = `SELECT 1
+    FROM forums
+    WHERE slug = $1;`
+    const answer = await query(sqlQuery, [slug]);
+    console.log(answer);
+    return answer.rowCount;
+  }
 
   async getForumThreads(slug, limit, since, desc) {
     let sqlQuery = `SELECT t.id, t.slug, t.author,

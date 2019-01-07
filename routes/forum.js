@@ -109,7 +109,13 @@ router.get('/:slug/users', async (req, res) => {
   } = req.query;
 
   try {
-    // const forum = await forumController.findForumBySlug(slug);
+    const forumIsExist = await forumController.isExist(slug);
+    if (!forumIsExist) {
+      return res.status(404).json({
+        "message": "Can't find forum by slug: 03I9V4x1eoKo8"
+      });
+    }
+
     users = await postController.getUsers({slug, limit, since, desc});
 
     if (users) {
@@ -120,6 +126,8 @@ router.get('/:slug/users', async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    return res.status(200).json([]);
+    return res.status(404).json({
+      "message": "Can't find forum by slug: 03I9V4x1eoKo8"
+    });
   }
 })

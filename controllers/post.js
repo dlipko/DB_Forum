@@ -205,7 +205,8 @@ class PostController {
   }
 
   async getUsers({ slug, limit, since, desc }) {
-    let sqlQuery = `SELECT *
+    let sqlQuery = `
+    SELECT *
     FROM users
     WHERE (nickname in (SELECT DISTINCT author FROM posts WHERE lower(forum) = lower($1)) 
     OR nickname IN (SELECT author FROM threads WHERE lower(forum) = lower($1)))`;
