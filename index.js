@@ -1,18 +1,40 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const routes = require('./routes/index');
+const setRoutes = require('./routes/index');
 const start = require('./db/start');
 
-const app = express();
-const port = 5000;
-
-app.use(bodyParser.json());
-routes(app);
 start();
 
-app.listen(port, (err) => {
-    if (err) {
-        return console.log('something bad happened', err)
+const fastify = require('fastify')();
+
+fastify.addContentTypeParser('application/json', { parseAs: 'buffer' }, function (req, body, done) {
+    // return await new Promise((body, done) => done(null, JSON.parse(body)))
+    // try {
+      // var json = JSON.parse(body)
+      if (body.length > 0) {
+        done(null, JSON.parse(body))
+      }
+      else
+      {
+        done(null, {})
+      }
+    // } catch (err) {
+    //   err.statusCode = 400
+    //   done(null, undefined)
+    // }
+  })
+
+setRoutes(fastify);
+
+const port = 5000;
+
+const startFastify = async () => {
+    try {
+        await fastify.listen(port);
+        fastify.log.info(`server listening on ${fastify.server.address().port}`);
+    } catch (err) {
+        fastify.log.error(err);
+        process.exit(1);
     }
-    console.log(`server is listening on ${port}`)
-})
+}
+startFastify()

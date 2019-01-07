@@ -31,13 +31,4 @@ module.exports = class User {
         return `nickname: ${this.getNickname()}\n
                 fullname: ${this.getFullname()}\n`;
     }
-
-    toJson() {
-        return {
-            nickname: this.getNickname(),
-            fullname: this.getFullname(),
-            email: this.getEmail(),
-            about: this.getAbout(),
-        }
-    }
 }

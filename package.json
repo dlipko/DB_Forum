@@ -12,6 +12,7 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "express-promise-router": "^3.0.3",
+    "fastify": "^1.13.3",
     "fs": "0.0.1-security",
     "pg": "^7.5.0"
   },

@@ -1,33 +1,9 @@
-DROP INDEX IF EXISTS index_users_on_email;
-DROP INDEX IF EXISTS index_users_on_nickname;
-DROP INDEX IF EXISTS index_forum_on_slug;
-DROP INDEX IF EXISTS index_threads_on_author_id;
-DROP INDEX IF EXISTS index_threads_on_forum_id;
-DROP INDEX IF EXISTS index_threads_on_slug;
-DROP INDEX IF EXISTS index_posts_on_author_id;
-DROP INDEX IF EXISTS index_posts_on_forum_id;
-DROP INDEX IF EXISTS index_posts_on_parent;
-DROP INDEX IF EXISTS index_posts_on_thread;
-DROP INDEX IF EXISTS index_posts_on_path;
-DROP INDEX IF EXISTS index_votes_on_user_id_and_thread;
-DROP INDEX IF EXISTS index_forum_members_on_user_id;
-
-DROP TRIGGER IF EXISTS on_vote_update ON votes;
-DROP TRIGGER IF EXISTS on_vote_insert ON votes;
-
-DROP FUNCTION IF EXISTS vote_insert();
-DROP FUNCTION IF EXISTS vote_update();
-
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS forums CASCADE;
-DROP TABLE IF EXISTS threads CASCADE;
 DROP TABLE IF EXISTS posts CASCADE;
-DROP TABLE IF EXISTS votes CASCADE;
-DROP TABLE IF EXISTS forum_members CASCADE;
 
 CREATE EXTENSION IF NOT EXISTS CITEXT;
 
 
+DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE IF NOT EXISTS users (
   nickname CITEXT  COLLATE ucs_basic NOT NULL PRIMARY KEY,
   fullname CITEXT NOT NULL,
@@ -35,13 +11,16 @@ CREATE TABLE IF NOT EXISTS users (
   about    TEXT
 );
 
+DROP INDEX IF EXISTS index_users_on_nickname;
 CREATE UNIQUE INDEX index_users_on_nickname
-  ON users (LOWER(nickname));
+  ON users (nickname);
 
+DROP INDEX IF EXISTS index_users_on_email;
 CREATE UNIQUE INDEX index_users_on_email
-  ON users (LOWER(email));
+  ON users (email);
 
 
+DROP TABLE IF EXISTS forums CASCADE;
 CREATE TABLE IF NOT EXISTS forums (
   id      BIGSERIAL PRIMARY KEY,
   posts   INT   NOT NULL DEFAULT 0,
@@ -51,12 +30,16 @@ CREATE TABLE IF NOT EXISTS forums (
   "user"  CITEXT  NOT NULL REFERENCES users(nickname)
 );
 
+DROP INDEX IF EXISTS index_forum_on_slug;
 CREATE UNIQUE INDEX index_forum_on_slug
-  ON forums (LOWER(slug));
+  ON forums (slug);
 
+DROP INDEX IF EXISTS index_forum_on_user;
 CREATE INDEX index_forum_on_user
-  ON forums (lower("user"));
+  ON forums ("user");
 
+
+DROP TABLE IF EXISTS threads CASCADE;
 CREATE TABLE IF NOT EXISTS threads (
   id        BIGSERIAL PRIMARY KEY,
   author    CITEXT        NOT NULL  REFERENCES users(nickname),
@@ -68,14 +51,16 @@ CREATE TABLE IF NOT EXISTS threads (
   votes     INT         NOT NULL DEFAULT 0
 );
 
-
+DROP INDEX IF EXISTS index_threads_on_forum;
 CREATE INDEX index_threads_on_forum
-  ON threads (lower(forum));
+  ON threads (forum);
 
+DROP INDEX IF EXISTS index_threads_on_slug;
 CREATE UNIQUE INDEX index_threads_on_slug
-  ON threads (LOWER(slug));
+  ON threads (slug);
 
-CREATE OR REPLACE FUNCTION thread_insert_update_forums()
+DROP FUNCTION IF EXISTS thread_insert_update_forums();
+CREATE FUNCTION thread_insert_update_forums()
   RETURNS TRIGGER AS '
 BEGIN
   UPDATE forums
@@ -106,25 +91,29 @@ CREATE TABLE IF NOT EXISTS posts (
   thread BIGINT NOT NULL
 );
 
+DROP INDEX IF EXISTS index_posts_on_thread_and_id;
 CREATE INDEX index_posts_on_thread_and_id
   ON posts(thread, id);
 
+DROP INDEX IF EXISTS index_posts_on_parent;
 CREATE INDEX index_posts_on_parent
   ON posts (parent);
 
+DROP INDEX IF EXISTS index_posts_on_thread;
 CREATE INDEX index_posts_on_thread
   ON posts (thread);
 
+DROP INDEX IF EXISTS index_posts_thread_path_parent;
 CREATE INDEX index_posts_thread_path_parent
   ON posts(thread, parent, path);
 
+DROP INDEX IF EXISTS index_posts_on_thread_and_path_and_id;
 CREATE INDEX index_posts_on_thread_and_path_and_id
   ON posts (thread, path ,id);
 
-DROP TRIGGER IF EXISTS on_post_update ON posts;
-DROP FUNCTION IF EXISTS post_update();
 
-CREATE OR REPLACE FUNCTION post_insert_update_forums()
+DROP FUNCTION IF EXISTS post_insert_update_forums();
+CREATE FUNCTION post_insert_update_forums()
   RETURNS TRIGGER AS '
 BEGIN
   UPDATE forums
@@ -136,17 +125,15 @@ END;
 ' LANGUAGE plpgsql;
 
 
+DROP TRIGGER IF EXISTS on_post_insert_update_forums ON posts;
 CREATE TRIGGER on_post_insert_update_forums
 AFTER INSERT ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_insert_update_forums();
 
 
 
-
-DROP TRIGGER IF EXISTS on_post_insert_update_path_root ON posts;
-DROP FUNCTION IF EXISTS post_insert_update_post_path_root();
-
-CREATE OR REPLACE FUNCTION post_insert_check_parent_forum()
+DROP FUNCTION IF EXISTS post_insert_check_parent_forum();
+CREATE FUNCTION post_insert_check_parent_forum()
   RETURNS TRIGGER AS '
 BEGIN
   IF NEW.parent != 0 
@@ -162,17 +149,13 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS on_post_insert_check_parent_forum ON posts;
 CREATE TRIGGER on_post_insert_check_parent_forum
 BEFORE INSERT ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_insert_check_parent_forum();
 
 
-
-
-
-DROP TRIGGER IF EXISTS on_post_insert_update_path_root ON posts;
 DROP FUNCTION IF EXISTS post_insert_update_post_path_root();
-
 CREATE OR REPLACE FUNCTION post_insert_update_post_path_root()
   RETURNS TRIGGER AS '
 DECLARE 
@@ -195,11 +178,13 @@ BEGIN
 END;
 ' LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS on_post_insert_update_path_root ON posts;
 CREATE TRIGGER on_post_insert_update_path_root
 BEFORE INSERT ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_insert_update_post_path_root();
 
 
+DROP TABLE IF EXISTS votes CASCADE;
 CREATE TABLE IF NOT EXISTS votes (
   nickname CITEXT  NOT NULL REFERENCES users(nickname),
   thread BIGINT REFERENCES threads (id) NOT NULL,
@@ -207,11 +192,13 @@ CREATE TABLE IF NOT EXISTS votes (
   PRIMARY KEY (nickname, thread)
 );
 
-
-CREATE UNIQUE INDEX index_votes_on_user_id_and_thread
+DROP INDEX IF EXISTS index_votes_on_nickname_and_thread;
+CREATE UNIQUE INDEX index_votes_on_nickname_and_thread
   ON votes (nickname, thread);
 
 
+
+DROP FUNCTION IF EXISTS vote_insert();
 CREATE FUNCTION vote_insert()
   RETURNS TRIGGER AS '
 BEGIN
@@ -224,27 +211,26 @@ END;
 ' LANGUAGE plpgsql;
 
 
+DROP TRIGGER IF EXISTS on_vote_insert ON votes;
 CREATE TRIGGER on_vote_insert
 AFTER INSERT ON votes
 FOR EACH ROW EXECUTE PROCEDURE vote_insert();
 
+DROP FUNCTION IF EXISTS vote_update();
 CREATE FUNCTION vote_update()
   RETURNS TRIGGER AS '
 BEGIN
-  IF OLD.voice = NEW.voice
-  THEN
+  IF OLD.voice = NEW.voice THEN
     RETURN NULL;
   END IF;
   UPDATE threads
-  SET
-    votes = votes + CASE WHEN NEW.voice = -1
-      THEN -2
-                    ELSE 2 END
+  SET votes = votes + CASE WHEN NEW.voice = -1 THEN -2 ELSE 2 END
   WHERE id = NEW.thread;
   RETURN NULL;
 END;
 ' LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS on_vote_update ON votes;
 CREATE TRIGGER on_vote_update
 AFTER UPDATE ON votes
 FOR EACH ROW EXECUTE PROCEDURE vote_update();

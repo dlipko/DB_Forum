@@ -11,13 +11,13 @@ class UserController {
   }
 
   async findUsersByNicknameOrEmail(nickname, email) {
-    const answer = await query(`SELECT * FROM users AS u WHERE lower($1) = lower(u.nickname) OR lower($2) = lower(u.email)`, [nickname, email])
+    const answer = await query(`SELECT * FROM users AS u WHERE $1 = u.nickname OR $2 = u.email`, [nickname, email])
     const newUsers = answer.rows.map(user => new User(user));
     return newUsers;
   }
 
   async findUserByNickname(nickname) {
-    const answer = await query(`SELECT * FROM users AS u WHERE lower($1) = lower(u.nickname)`, [nickname])
+    const answer = await query(`SELECT * FROM users AS u WHERE $1 = u.nickname`, [nickname])
     if (answer.rowCount != 0) {
       return new User(answer.rows[0]);
     }
@@ -30,14 +30,14 @@ class UserController {
     const sqlQuery = `UPDATE users SET fullname = COALESCE($1, fullname),
     email = COALESCE($2, email),
     about = COALESCE($3, about)
-    WHERE lower($4) = lower(nickname)
+    WHERE $4 = nickname
     RETURNING *`; 
     const answer = await query(sqlQuery, [fullname, email, about, nickname]);
     return new User(answer.rows[0]);
   }
 
   async getUserNicknameByNickname(nickname) {
-    const sqlQuery = `SELECT u.nickname FROM users u WHERE lower(nickname) = lower($1)`;
+    const sqlQuery = `SELECT u.nickname FROM users u WHERE nickname = $1`;
     const answer = await query(sqlQuery, [nickname]);
     return answer.rows[0].nickname;
   }

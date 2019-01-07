@@ -16,12 +16,8 @@ class PostController {
         if (!post.parent) {
           post.parent = 0;
         }
-        // sqlQuery += `((SELECT u.nickname FROM users u WHERE lower(u.nickname) = lower('${post.author}')),
-        // (SELECT f.slug FROM forums f WHERE lower(f.slug) = lower('${thread.getForum()}')), true, '${post.message}', 
-        // (SELECT id FROM posts WHERE id = ${post.parent}), ${thread.getId()});`;
-
-        sqlQuery += `((SELECT u.nickname FROM users u WHERE lower(u.nickname) = lower('${post.author}')),
-        (SELECT f.slug FROM forums f WHERE lower(f.slug) = lower('${thread.getForum()}')), FALSE, '${post.message}', 
+        sqlQuery += `((SELECT u.nickname FROM users u WHERE u.nickname = '${post.author}'),
+        (SELECT f.slug FROM forums f WHERE f.slug = '${thread.getForum()}'), FALSE, '${post.message}', 
         ${post.parent}, ${thread.getId()}),`;
       
         // const params = [post.author, created, thread.getForum(), post.message, post.parent, thread.getId()];
@@ -41,23 +37,6 @@ class PostController {
   }
   return [];
 }
-
-/*
-  async findThreadBySlug(slug) {
-    const sqlQuery = `SELECT t.id, t.author, t.forum,
-    t.slug, t.created, t.message, t.title, t.votes
-    FROM threads t
-    WHERE lower(t.slug) = lower($1)`;
-
-    const answer = await query(sqlQuery, [slug]);
-    if (answer.rowCount != 0) {
-      return new Thread(answer.rows[0]);
-    }
-    else {
-      return undefined;
-    }
-  }
-*/
 
   async flatSort({threadId, limit, since, desc}) {
     let sqlQuery = `SELECT *
@@ -208,8 +187,8 @@ class PostController {
     let sqlQuery = `
     SELECT *
     FROM users
-    WHERE (nickname in (SELECT DISTINCT author FROM posts WHERE lower(forum) = lower($1)) 
-    OR nickname IN (SELECT author FROM threads WHERE lower(forum) = lower($1)))`;
+    WHERE (nickname in (SELECT DISTINCT author FROM posts WHERE forum = $1) 
+    OR nickname IN (SELECT author FROM threads WHERE forum = $1))`;
     
     if (since) {
 			if (desc === 'true') {

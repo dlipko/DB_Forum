@@ -9,7 +9,7 @@ class ForumController {
   async createForum(slug, title, user) {
     user = await userController.getUserNicknameByNickname(user);
     const sqlQuery = `INSERT INTO forums (slug, title, \"user\")
-      VALUES ($1, $2, (SELECT nickname FROM users WHERE lower(nickname) = lower($3)))`;
+      VALUES ($1, $2, (SELECT nickname FROM users WHERE nickname = $3))`;
     const answer = await query(sqlQuery, [slug, title, user]);
     return new Forum({
       slug,
@@ -21,7 +21,7 @@ class ForumController {
   async findForumBySlug(slug) {
     const sqlQuery = `SELECT *
     FROM forums f
-    WHERE lower(f.slug) = lower($1)`;
+    WHERE f.slug = $1`;
 
     const answer = await query(sqlQuery, [slug]);
     if (answer.rowCount != 0) {
@@ -43,7 +43,7 @@ class ForumController {
     let sqlQuery = `SELECT t.id, t.slug, t.author,
     t.forum, t.created, t.message, t.title
     FROM threads t
-    WHERE lower(t.forum) = lower($1) `;
+    WHERE t.forum = $1 `;
 
     if (since) {
       if (desc == 'true') {

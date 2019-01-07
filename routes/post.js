@@ -1,93 +1,90 @@
-const Router = require('express-promise-router');
 const postController = require('../controllers/post');
 const userController = require('../controllers/user');
 const threadController = require('../controllers/thread');
 const forumController = require('../controllers/forum');
 
-// create a new express-promise-router
-// this has the same API as the normal express router except
-// it allows you to use async functions as route handlers
-const router = new Router();
 
-module.exports = router;
-// export our router to be mounted by the parent application
 
-router.get('/:id/details', async (req, res) => {
+class PostRouter {
+  constructor(url, app) {
+    app.get(`${url}/:id/details`, getPostDetails);
+    app.post(`${url}/:id/details`, postPostDetails);
+  }
+}
+
+async function getPostDetails(req, res) {
   const {
     id
   } = req.params;
-
+  
   let {
     related
   } = req.query;
-
+  
   let answer = {};
   try {
     const post = await postController.findPostById(id);
-
+    
     if (post && Object.keys(post).length != 0) {
-        answer.post = post;
+      answer.post = post;
     } else {
-      return res.status(404).json({
+      return res.status(404).send({
         message: "Can't find post with id: 2139800938"
       });
     }
-
+    
     if (related) {
       related = related.split(',');
-      console.log(related);
-      for (let i = 0; i <related.length; i++) {
+      for (let i = 0; i < related.length; i++) {
         const field = related[i];
-        switch(field) {
+        switch (field) {
           case 'user':
-          answer.author = await userController.findUserByNickname(post.author);
-          console.log('author', answer);
+            answer.author = await userController.findUserByNickname(post.author);
             break;
           case 'thread':
-          answer.thread = await threadController.findThreadById(post.thread);
-          console.log('thread', answer);
+            answer.thread = await threadController.findThreadById(post.thread);
             break;
           case 'forum':
-          answer.forum = await forumController.findForumBySlug(post.forum);
-          console.log('forum', answer);
+            answer.forum = await forumController.findForumBySlug(post.forum);
             break;
           default:
             break;
         }
       }
     }
-
-    console.log('ANSWER', answer.author);
-    return res.status(200).json(answer);
-
-
+    
+    return res.status(200).send(answer);
+    
+    
   } catch (error) {
     console.log(error);
-    return res.status(409).json({
+    return res.status(409).send({
       message: 'fghjk',
     });
   }
-})
+};
 
 
-router.post('/:id/details', async (req, res) => {
-    const {
-      id
-    } = req.params;
-    
-      try {
-          const post = await postController.updateById(id, req.body.message);
-            if (post) {
-              return res.status(200).json(post);
-            } else {
-              return res.status(404).json({
-                message: `Can't find thread by slug: ${id}`,
-              });
-            }
-        } catch (error) {
-            // console.log(error);
-          return res.status(404).json({
-          message: `Can't find thread by slug: ${id}`,
-        });
-      }
-  });
+async function postPostDetails(req, res) {
+  const {
+    id
+  } = req.params;
+  
+  try {
+    const post = await postController.updateById(id, req.body.message);
+    if (post) {
+      return res.status(200).send(post);
+    } else {
+      return res.status(404).send({
+        message: `Can't find thread by slug: ${id}`,
+      });
+    }
+  } catch (error) {
+    // console.log(error);
+    return res.status(404).send({
+      message: `Can't find thread by slug: ${id}`,
+    });
+  }
+};
+
+module.exports = PostRouter;

@@ -6,9 +6,9 @@ class ThreadController {
 
   async createThread(author, created, forum, message, slug, title) {
       const sqlQuery = `INSERT INTO threads (author, created, forum, message, slug, title)
-      VALUES ((SELECT u.nickname FROM users u WHERE lower(u.nickname) = lower($1)),
+      VALUES ((SELECT u.nickname FROM users u WHERE u.nickname = $1),
       COALESCE($2::TIMESTAMPTZ, current_timestamp),
-      ( SELECT f.slug FROM forums f WHERE lower(f.slug) = lower($3) ), $4, $5, $6) RETURNING *`;
+      ( SELECT f.slug FROM forums f WHERE f.slug = $3), $4, $5, $6) RETURNING *`;
     
       const params = [author, created, forum, message, slug, title];
       const answer = await query(sqlQuery, params);
@@ -29,7 +29,7 @@ class ThreadController {
     const sqlQuery = `SELECT t.id, t.author, t.forum,
     t.slug, t.created, t.message, t.title, t.votes
     FROM threads t
-    WHERE lower(t.slug) = lower($1)`;
+    WHERE t.slug = $1`;
 
     const answer = await query(sqlQuery, [slug]);
     // console.log('findThreadBySlug', answer);
@@ -63,15 +63,15 @@ class ThreadController {
     let params = [];
     if (message) {
       if (title) {
-        sqlQuery += `"message" = $1, title = $2 WHERE lower(slug) = lower($3) RETURNING *;`;
+        sqlQuery += `"message" = $1, title = $2 WHERE slug = $3 RETURNING *;`;
         params = [message, title, slug];
       } else {
-        sqlQuery += `"message" = $1 WHERE lower(slug) = lower($2) RETURNING *;`;
+        sqlQuery += `"message" = $1 WHERE slug = $2 RETURNING *;`;
         params = [message, slug];
       }
     } else {
       if (title) {
-        sqlQuery += `title = $1 WHERE lower(slug) = lower($2) RETURNING *;`;
+        sqlQuery += `title = $1 WHERE slug = $2 RETURNING *;`;
         params = [title, slug];
       } else {
         return undefined;
