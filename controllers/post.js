@@ -207,19 +207,17 @@ class PostController {
   async getUsers({ slug, limit, since, desc }) {
     let sqlQuery = `SELECT *
     FROM users
-    WHERE ( nickname in (SELECT DISTINCT author FROM posts WHERE lower(forum) = lower($1)`;
-
-
+    WHERE (nickname in (SELECT DISTINCT author FROM posts WHERE lower(forum) = lower($1)) 
+    OR nickname IN (SELECT author FROM threads WHERE lower(forum) = lower($1)))`;
+    
     if (since) {
 			if (desc === 'true') {
-				sqlQuery += ` AND author < '${since}'`;
+				sqlQuery += ` AND nickname < '${since}'`;
 			} else {
-				sqlQuery += ` AND author > '${since}'`;
+				sqlQuery += ` AND nickname > '${since}'`;
 			}
     }
 
-    sqlQuery += ' ) OR nickname IN (SELECT author FROM threads WHERE lower(forum) = lower($1)) ) ';
-    
     sqlQuery += ` ORDER BY nickname `;
 
 		if (desc === 'true') {
