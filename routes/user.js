@@ -48,6 +48,7 @@ async function editProfile(req, res) {
     const user = await userController.updateUser(nickname, req.body.fullname, req.body.email, req.body.about);
     return res.status(200).send(user);
   } catch (error) {
+    // console.log(error);
     if (error.code == EMAIL_REGISTERED) {
       return res.status(409).send({
         "message": `This email is already registered`

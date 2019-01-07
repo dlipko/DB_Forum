@@ -75,13 +75,14 @@ class PostController {
     FROM posts
     WHERE thread = ${threadId} `;
 
-
     if (since) {
+      sqlQuery += ` AND path `;
 			if (desc === 'true') {
-				sqlQuery += ` AND path < (SELECT path FROM posts WHERE id = ${since})`;
+				sqlQuery += ` < `;
 			} else {
-				sqlQuery += ` AND path > (SELECT path FROM posts WHERE id = ${since})`;
+				sqlQuery += ` > `;
       }
+      sqlQuery += ` (SELECT path FROM posts WHERE id = ${since}) `;
     }
 
     sqlQuery += ` ORDER BY path `; 
@@ -95,8 +96,6 @@ class PostController {
     }
 
     sqlQuery += `;`;
-
-    // console.log('sqlQuery treeSort', sqlQuery);
 
     const answer = await query(sqlQuery, []);
     if (answer.rowCount != 0) {
@@ -113,11 +112,13 @@ class PostController {
     WHERE root IN (SELECT id FROM posts WHERE thread = ${threadId} AND parent = 0`;
 
     if (since) {
+      sqlQuery += ` AND id `;
 			if (desc === 'true') {
-				sqlQuery += ` AND id < (SELECT root FROM posts WHERE id = ${since})`;
+				sqlQuery += ` < `;
 			} else {
-				sqlQuery += ` AND id > (SELECT root FROM posts WHERE id = ${since})`;
-			}
+				sqlQuery += ` > `;
+      }
+      sqlQuery += ` (SELECT root FROM posts WHERE id = ${since}) `;
     }
     
     sqlQuery += ` ORDER BY id `;

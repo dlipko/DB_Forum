@@ -5,13 +5,23 @@ class ThreadController {
   constructor() {}
 
   async createThread(author, created, forum, message, slug, title) {
-      const sqlQuery = `INSERT INTO threads (author, created, forum, message, slug, title)
-      VALUES ((SELECT nickname FROM users WHERE nickname = $1),
-      COALESCE($2::TIMESTAMPTZ, current_timestamp),
-      (SELECT slug FROM forums WHERE slug = $3), $4, $5, $6) RETURNING *`;
-    
-      const params = [author, created, forum, message, slug, title];
-      const answer = await query(sqlQuery, params);
+      let sqlQuery = `
+      INSERT
+      INTO threads (author, forum, created, message, slug, title) 
+      VALUES ((SELECT nickname FROM users WHERE nickname = '${author}'),
+      (SELECT slug FROM forums WHERE slug = '${forum}'), `;
+      if (created) {
+        sqlQuery += ` '${created}'::TIMESTAMPTZ, `;
+      } else {
+        sqlQuery += `current_timestamp, `;
+      }
+      sqlQuery += `
+        '${message}',
+        $1,
+        '${title}') 
+        RETURNING *`;
+
+      const answer = await query(sqlQuery, [slug]);
 
 
       if (answer.rowCount != 0) {
@@ -26,10 +36,9 @@ class ThreadController {
 
   async findThreadBySlug(slug) {
     // console.log('findThreadBySlug', slug);
-    const sqlQuery = `SELECT t.id, t.author, t.forum,
-    t.slug, t.created, t.message, t.title, t.votes
-    FROM threads t
-    WHERE t.slug = $1`;
+    const sqlQuery = `SELECT *
+    FROM threads
+    WHERE slug = $1`;
 
     const answer = await query(sqlQuery, [slug]);
     // console.log('findThreadBySlug', answer);

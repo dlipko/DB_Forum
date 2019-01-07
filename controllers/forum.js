@@ -40,24 +40,23 @@ class ForumController {
   }
 
   async getForumThreads(slug, limit, since, desc) {
-    let sqlQuery = `SELECT t.id, t.slug, t.author,
-    t.forum, t.created, t.message, t.title
-    FROM threads t
-    WHERE t.forum = $1 `;
+    let sqlQuery = `SELECT *
+    FROM threads
+    WHERE forum = $1 `;
 
     if (since) {
       if (desc == 'true') {
-        sqlQuery += ` AND t.created <= '${since}'::TIMESTAMPTZ ORDER BY t.created DESC `;
+        sqlQuery += ` AND created <= '${since}'::TIMESTAMPTZ `;
       } else {
-        sqlQuery += ` AND t.created >= '${since}'::TIMESTAMPTZ ORDER BY t.created ASC `;
+        sqlQuery += ` AND created >= '${since}'::TIMESTAMPTZ `;
       }
+    }
+
+    sqlQuery += ` ORDER BY created `;
+    if (desc == 'true') {
+      sqlQuery += ` DESC `;
     } else {
-      sqlQuery += ` ORDER BY t.created `;
-      if (desc == 'true') {
-        sqlQuery += ` DESC `;
-      } else {
-        sqlQuery += ` ASC `;
-      }
+      sqlQuery += ` ASC `;
     }
 
     sqlQuery += `LIMIT $2`;

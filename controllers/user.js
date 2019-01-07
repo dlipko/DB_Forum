@@ -36,13 +36,26 @@ class UserController {
   }
 
   async updateUser(nickname, fullname, email, about) {
-    const sqlQuery = `UPDATE users 
-    SET fullname = COALESCE($1, fullname),
-    email = COALESCE($2, email),
-    about = COALESCE($3, about)
-    WHERE nickname = $4
+    let sqlQuery = `UPDATE users SET `
+    if (fullname) {
+      sqlQuery += ` fullname = '${fullname}', `;
+    } else {
+      sqlQuery += ` fullname = fullname, `;
+    }
+    if (email) {
+      sqlQuery += ` email = '${email}', `;
+    } else {
+      sqlQuery += ` email = email, `;
+    }
+    if (about) {
+      sqlQuery += ` about = '${about}' `;
+    } else {
+      sqlQuery += ` about = about `;
+    }
+    sqlQuery += `
+    WHERE nickname = '${nickname}'
     RETURNING *`; 
-    const answer = await query(sqlQuery, [fullname, email, about, nickname]);
+    const answer = await query(sqlQuery, []);
     return new User(answer.rows[0]);
   }
 
