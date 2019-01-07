@@ -37,6 +37,12 @@ router.post('/:slugOrId/create', async (req, res) => {
     }
   } catch (error) {
     console.log(error);
+    console.log('ERROR CODE', error.code);
+    if (error.code === '23502') {
+      return res.status(404).json({
+        message: `Can't find post author by nickname:`,
+    });
+    }
     return res.status(409).json({
         message: `Can't find post author by nickname:`,
     });
