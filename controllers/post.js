@@ -16,11 +16,9 @@ class PostController {
         if (!post.parent) {
           post.parent = 0;
         }
-        sqlQuery += `((SELECT u.nickname FROM users u WHERE u.nickname = '${post.author}'),
-        (SELECT f.slug FROM forums f WHERE f.slug = '${thread.getForum()}'), FALSE, '${post.message}', 
+        sqlQuery += `((SELECT nickname FROM users WHERE nickname = '${post.author}'),
+        (SELECT slug FROM forums WHERE slug = '${thread.getForum()}'), FALSE, '${post.message}', 
         ${post.parent}, ${thread.getId()}),`;
-      
-        // const params = [post.author, created, thread.getForum(), post.message, post.parent, thread.getId()];
       });
 
     sqlQuery = sqlQuery.substring(0, sqlQuery.length - 1);
@@ -112,13 +110,13 @@ class PostController {
   async parentTreeSort({threadId, limit, since, desc}) {
     let sqlQuery = `SELECT *
     FROM posts
-    WHERE root IN (SELECT id FROM posts WHERE thread=${threadId} AND parent=0`;
+    WHERE root IN (SELECT id FROM posts WHERE thread = ${threadId} AND parent = 0`;
 
     if (since) {
 			if (desc === 'true') {
-				sqlQuery += ` AND id < (SELECT root FROM posts WHERE id=${since})`;
+				sqlQuery += ` AND id < (SELECT root FROM posts WHERE id = ${since})`;
 			} else {
-				sqlQuery += ` AND id > (SELECT root FROM posts WHERE id=${since})`;
+				sqlQuery += ` AND id > (SELECT root FROM posts WHERE id = ${since})`;
 			}
     }
     
@@ -139,8 +137,6 @@ class PostController {
 		}
 
     sqlQuery += `;`;
-
-    // console.log('sqlQuery parentTreeSort', sqlQuery);
 
     const answer = await query(sqlQuery, []);
     if (answer.rowCount != 0) {
@@ -187,7 +183,7 @@ class PostController {
     let sqlQuery = `
     SELECT *
     FROM users
-    WHERE (nickname in (SELECT DISTINCT author FROM posts WHERE forum = $1) 
+    WHERE (nickname IN (SELECT DISTINCT author FROM posts WHERE forum = $1) 
     OR nickname IN (SELECT author FROM threads WHERE forum = $1))`;
     
     if (since) {
@@ -210,7 +206,6 @@ class PostController {
 
     sqlQuery += `;`;
 
-    // console.log('sqlQuery getUsers', sqlQuery);
 
     const answer = await query(sqlQuery, [slug]);
     if (answer.rowCount != 0) {

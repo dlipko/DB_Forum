@@ -6,9 +6,9 @@ class ThreadController {
 
   async createThread(author, created, forum, message, slug, title) {
       const sqlQuery = `INSERT INTO threads (author, created, forum, message, slug, title)
-      VALUES ((SELECT u.nickname FROM users u WHERE u.nickname = $1),
+      VALUES ((SELECT nickname FROM users WHERE nickname = $1),
       COALESCE($2::TIMESTAMPTZ, current_timestamp),
-      ( SELECT f.slug FROM forums f WHERE f.slug = $3), $4, $5, $6) RETURNING *`;
+      (SELECT slug FROM forums WHERE slug = $3), $4, $5, $6) RETURNING *`;
     
       const params = [author, created, forum, message, slug, title];
       const answer = await query(sqlQuery, params);
@@ -43,12 +43,11 @@ class ThreadController {
 
   async findThreadById(id) {
     // console.log('FINDTHREADBYID', id);
-    const sqlQuery = `SELECT t.id, t.slug, t.author, t.created, 
-    t.forum, t.message, t.title, t.votes
-    FROM threads t
-    WHERE t.id = $1`;
+    const sqlQuery = `SELECT *
+    FROM threads
+    WHERE id = ${id}`;
 
-    const answer = await query(sqlQuery, [id]);
+    const answer = await query(sqlQuery, []);
     if (answer.rowCount != 0) {
       return new Thread(answer.rows[0]);
     }
