@@ -22,7 +22,7 @@ async function createForum(req, res) {
     const forum = await forumController.createForum(req.body.slug, req.body.title, req.body.user);
     return res.status(201).send(forum);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     if (error.code == SLUG_REGISTERED) {
       const forum = await forumController.findForumBySlug(req.body.slug);
       return res.status(409).send(forum);
@@ -39,10 +39,9 @@ async function createThread(req, res) {
   } = req.params;
   
   if (req.body.forum)
-  forumSlug = req.body.forum;
+    forumSlug = req.body.forum;
   
   
-  // console.log('/:forumSlug/create', forumSlug);
   try {
     const thread = await threadController.createThread(
       req.body.author,
@@ -51,18 +50,17 @@ async function createThread(req, res) {
       req.body.message,
       req.body.slug,
       req.body.title);
-      // console.log('THREAD CREATETHREAD', thread);
+
       return res.status(201).send(thread);
     } catch (error) {
-      // console.log(error);
       if (error.code == 23502) { // null value in column "forum" violates not-null constraint
       return res.status(404).send({
         "message": `Can't find thread author by nickname: ${req.body.author}`
       });
-    } else {
-      const thread = await threadController.findThreadBySlug(req.body.slug);
-      return res.status(409).send(thread);
-    }
+      } else {
+        const thread = await threadController.findThreadBySlug(req.body.slug);
+        return res.status(409).send(thread);
+      }
   }
 };
 

@@ -32,32 +32,37 @@ async function getPostDetails(req, res) {
         message: "Can't find post with id: 2139800938"
       });
     }
-    
+    let authorPromise, threadPromise, forumPromise;
     if (related) {
       related = related.split(',');
       for (let i = 0; i < related.length; i++) {
         const field = related[i];
         switch (field) {
           case 'user':
-            answer.author = await userController.findUserByNickname(post.author);
-            break;
+          authorPromise = userController.findUserByNickname(post.author);
+          break;
           case 'thread':
-            answer.thread = await threadController.findThreadById(post.thread);
-            break;
+          threadPromise = threadController.findThreadById(post.thread);
+          break;
           case 'forum':
-            answer.forum = await forumController.findForumBySlug(post.forum);
-            break;
+          forumPromise = forumController.findForumBySlug(post.forum);
+          break;
           default:
-            break;
+          break;
         }
       }
     }
     
+    const [author, thread, forum] = await Promise.all([authorPromise, threadPromise, forumPromise]);
+    if (author) answer.author = author;
+    if (thread) answer.thread = thread;
+    if (forum) answer.forum = forum;
+    
+    // console.timeEnd('getPostDetails');
     return res.status(200).send(answer);
-    
-    
+
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return res.status(409).send({
       message: 'fghjk',
     });

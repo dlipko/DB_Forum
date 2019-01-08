@@ -26,7 +26,6 @@ DROP FUNCTION IF EXISTS vote_insert();
 DROP FUNCTION IF EXISTS post_insert_update_path_root();
 DROP FUNCTION IF EXISTS post_insert_check_parent_forum();
 DROP FUNCTION IF EXISTS post_insert_update_forums();
-DROP FUNCTION IF EXISTS post_insert_set_forum_user;
 
 DROP TRIGGER IF EXISTS on_thread_insert_update_forums ON threads;
 DROP TRIGGER IF EXISTS on_vote_update ON votes;
@@ -34,7 +33,6 @@ DROP TRIGGER IF EXISTS on_vote_insert ON votes;
 DROP TRIGGER IF EXISTS on_post_insert_update_path_root ON posts;
 DROP TRIGGER IF EXISTS on_post_insert_check_parent_forum ON posts;
 DROP TRIGGER IF EXISTS on_post_insert_update_forums ON posts;
-DROP TRIGGER IF EXISTS on_post_insert_set_forum_user on posts;
 
 ----------------USERS----------------
 CREATE TABLE IF NOT EXISTS users (
@@ -110,51 +108,51 @@ CREATE TABLE IF NOT EXISTS posts (
   thread BIGINT                         NOT NULL
 );
 
-CREATE INDEX index_posts_on_thread_and_id           ON posts (thread, id);
-CREATE INDEX index_posts_on_parent                  ON posts (parent);
-CREATE INDEX index_posts_on_thread                  ON posts (thread);
-CREATE INDEX index_posts_thread_path_parent         ON posts (thread, parent);
-CREATE INDEX index_posts_root_and_path              ON posts(root, path);
-CREATE INDEX index_posts_on_thread_and_path_and_id  ON posts (thread, path);
+
+-- CREATE INDEX index_posts_on_thread_and_id           ON posts (thread, id);
+-- CREATE INDEX index_posts_on_parent                  ON posts (parent);
+-- CREATE INDEX index_posts_on_thread                  ON posts (thread);
+-- CREATE INDEX index_posts_thread_path_parent         ON posts (thread, parent);
+-- CREATE INDEX index_posts_root_and_path              ON posts(root, path);
+-- CREATE INDEX index_posts_on_thread_and_path_and_id  ON posts (thread, path);
 
 
-CREATE FUNCTION post_insert_update_forums()
-  RETURNS TRIGGER AS '
-BEGIN
-  UPDATE forums
-  SET
-    posts = posts + 1
-  WHERE slug = NEW.forum;
-  RETURN NEW;
-END;
-' LANGUAGE plpgsql;
+-- CREATE FUNCTION post_insert_update_forums()
+--   RETURNS TRIGGER AS '
+-- BEGIN
+--   UPDATE forums
+--   SET
+--     posts = posts + 1
+--   WHERE slug = NEW.forum;
+--   RETURN NEW;
+-- END;
+-- ' LANGUAGE plpgsql;
 
 
-CREATE TRIGGER on_post_insert_update_forums
-BEFORE INSERT ON posts
-FOR EACH ROW EXECUTE PROCEDURE post_insert_update_forums();
+-- CREATE TRIGGER on_post_insert_update_forums
+-- BEFORE INSERT ON posts
+-- FOR EACH ROW EXECUTE PROCEDURE post_insert_update_forums();
 
 
+-- CREATE FUNCTION post_insert_check_parent_forum()
+--   RETURNS TRIGGER AS '
+-- BEGIN
+--   IF NEW.parent != 0 
+--   THEN
+--     IF NEW.forum = (SELECT forum FROM posts WHERE id = NEW.parent) 
+--     THEN
+--       return NEW;
+--     ELSE
+--       RAISE division_by_zero;
+--     END IF;
+--   END IF;
+--   RETURN NEW;
+-- END;
+-- ' LANGUAGE plpgsql;
 
-CREATE FUNCTION post_insert_check_parent_forum()
-  RETURNS TRIGGER AS '
-BEGIN
-  IF NEW.parent != 0 
-  THEN
-    IF NEW.forum = (SELECT forum FROM posts WHERE id = NEW.parent) 
-    THEN
-      return NEW;
-    ELSE
-      RAISE division_by_zero;
-    END IF;
-  END IF;
-  RETURN NEW;
-END;
-' LANGUAGE plpgsql;
-
-CREATE TRIGGER on_post_insert_check_parent_forum
-BEFORE INSERT ON posts
-FOR EACH ROW EXECUTE PROCEDURE post_insert_check_parent_forum();
+-- CREATE TRIGGER on_post_insert_check_parent_forum
+-- BEFORE INSERT ON posts
+-- FOR EACH ROW EXECUTE PROCEDURE post_insert_check_parent_forum();
 
 
 CREATE OR REPLACE FUNCTION post_insert_update_path_root()
@@ -163,6 +161,12 @@ DECLARE
     parent_root INTEGER;
     parent_path BIGINT [];
 BEGIN
+
+  UPDATE forums
+  SET
+    posts = posts + 1
+  WHERE slug = NEW.forum;
+
   SELECT root, path INTO parent_root, parent_path
   FROM posts 
   WHERE id = NEW.parent;
@@ -174,6 +178,17 @@ BEGIN
   END IF;
 
   NEW.path = array_append(parent_path, NEW.id);
+
+
+  IF NEW.parent != 0 
+  THEN
+    IF NEW.forum = (SELECT forum FROM posts WHERE id = NEW.parent) 
+    THEN
+      return NEW;
+    ELSE
+      RAISE division_by_zero;
+    END IF;
+  END IF;
 
   RETURN NEW;
 END;
@@ -229,25 +244,4 @@ AFTER UPDATE ON votes
 FOR EACH ROW EXECUTE PROCEDURE vote_update();
 
 
-CREATE TABLE IF NOT EXISTS forumusers (
-  nickname  CITEXT                          NOT NULL          REFERENCES users(nickname),
-  slug      CITEXT                          NOT NULL          REFERENCES forums(slug),
-  CONSTRAINT forumusers_pimaty_key PRIMARY KEY (slug, nickname)
-);
-
-CREATE FUNCTION post_insert_set_forum_user()
-  RETURNS TRIGGER AS '
-BEGIN
-  IF NEW.author NOT IN (SELECT nickname from forumusers WHERE slug = NEW.forum) 
-  THEN
-    INSERT INTO forumusers (nickname, slug)
-    VALUES (NEW.author, NEW.forum);    
-  END IF;
-  RETURN NULL;
-END;
-' LANGUAGE plpgsql;
-
-CREATE TRIGGER on_post_insert_set_forum_user
-AFTER INSERT ON posts
-FOR EACH ROW EXECUTE PROCEDURE post_insert_set_forum_user();
 

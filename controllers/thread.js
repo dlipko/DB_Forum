@@ -5,27 +5,15 @@ class ThreadController {
   constructor() {}
 
   async createThread(author, created, forum, message, slug, title) {
-      let sqlQuery = `
-      INSERT
-      INTO threads (author, forum, created, message, slug, title) 
-      VALUES ((SELECT nickname FROM users WHERE nickname = '${author}'),
-      (SELECT slug FROM forums WHERE slug = '${forum}'), `;
-      if (created) {
-        sqlQuery += ` '${created}'::TIMESTAMPTZ, `;
-      } else {
-        sqlQuery += `current_timestamp, `;
-      }
-      sqlQuery += `
-        '${message}',
-        $1,
-        '${title}') 
-        RETURNING *`;
+    const sqlQuery = `INSERT INTO threads (author, created, forum, message, slug, title)
+    VALUES ((SELECT nickname FROM users WHERE nickname = $1),
+    COALESCE($2::TIMESTAMPTZ, current_timestamp),
+    (SELECT slug FROM forums WHERE slug = $3), $4, $5, $6) RETURNING *`;
 
-      const answer = await query(sqlQuery, [slug]);
-
+    const params = [author, created, forum, message, slug, title];
+    const answer = await query(sqlQuery, params);
 
       if (answer.rowCount != 0) {
-        // console.log('THREAD', new Thread(answer.rows[0]));
         return new Thread(answer.rows[0]);
       }
       else {

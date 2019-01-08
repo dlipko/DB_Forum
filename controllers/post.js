@@ -7,7 +7,6 @@ class PostController {
 
   async createPosts(posts, thread) {
     if (posts.length) { 
-    const created = new Date().toISOString();
     let sqlQuery = `INSERT INTO posts 
     (author, forum, is_edited, message, parent, thread)
     VALUES `;
@@ -26,7 +25,7 @@ class PostController {
 
     const answer = await query(sqlQuery);
     if (await this.getStatus() === 1500000) {
-      await query("CLUSTER posts using index_posts_root_and_path; CLUSTER forumusers using forumusers_pimaty_key;");
+      await query("CLUSTER posts using index_posts_root_and_path;");
     }
     if (answer.rowCount != 0) {
       return new Posts(answer.rows).posts;
@@ -186,7 +185,7 @@ class PostController {
     let sqlQuery = `
     SELECT *
     FROM users
-    WHERE (nickname IN (SELECT nickname FROM forumusers WHERE slug = $1) 
+    WHERE (nickname IN (SELECT DISTINCT author FROM posts WHERE forum = $1) 
     OR nickname IN (SELECT author FROM threads WHERE forum = $1))`;
     
     if (since) {

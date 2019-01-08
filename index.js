@@ -1,17 +1,21 @@
 const setRoutes = require('./routes/index');
 const start = require('./db/start');
 
+const morgan  = require('morgan');
+
 start();
 
 const fastify = require('fastify')();
+
+fastify.use(morgan('dev'));
 
 // EMPTY BODY
 if (!fastify.hasContentTypeParser('application/json')) {
   fastify.addContentTypeParser('application/json', { parseAs: 'buffer'}, 
   (_, body, done) => {
-    try {
+    if (body.length > 0) {
       done(null, JSON.parse(body));
-    } catch (error) {
+    } else {
       done(null, {});
     }
   });

@@ -10,7 +10,8 @@ class VoteController {
       INTO votes (nickname, thread, voice) 
       VALUES ('${nickname}', `;
 
-    if (/^[0-9]*$/i.test(threadIdOrSlug)) {
+    const test = /^[0-9]*$/i.test(threadIdOrSlug);
+    if (test) {
         threadIdOrSlug = parseInt(threadIdOrSlug, 10);
         sqlQuery += ` ${threadIdOrSlug}`;
     } else {
@@ -19,12 +20,9 @@ class VoteController {
 
     sqlQuery += `, ${voise})  ON CONFLICT (nickname, thread) DO UPDATE SET voice = ${voise};`;
 
-    // console.log(sqlQuery);
     const answer = await query(sqlQuery, []);
 
-    // console.log(answer);
-
-    const thread = /^[0-9]*$/i.test(threadIdOrSlug) ? await threadController.findThreadById(threadIdOrSlug) :
+    const thread = test ? await threadController.findThreadById(threadIdOrSlug) :
   await threadController.findThreadBySlug(threadIdOrSlug);
 
     if (thread) {

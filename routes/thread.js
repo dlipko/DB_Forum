@@ -16,13 +16,13 @@ class ThreadRouter {
 }
 
 async function createThread(req, res) {
-  try {
   const {
     slugOrId
   } = req.params;
   const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
   await threadController.findThreadBySlug(slugOrId);
   
+  try {
   if (!thread) {
     return res.status(404).send({
       message: `Can't find post thread by id: ${slugOrId}`,
@@ -42,8 +42,7 @@ async function createThread(req, res) {
       });
     }
   } catch (error) {
-    console.log(error);
-    // console.log('ERROR CODE', error.code);
+    // console.log('createThread', error);
     if (error.code === '23502') {
       return res.status(404).send({
         message: `Can't find post author by nickname:`,
