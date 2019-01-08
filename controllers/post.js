@@ -6,9 +6,6 @@ class PostController {
   constructor() {}
 
   async createPosts(posts, thread) {
-    if (await this.getStatus() === 1500000) {
-      await query("CLUSTER posts using index_posts_root_and_path; CLUSTER forumusers using forumusers_pimaty_key;");
-    }
     if (posts.length) { 
     const created = new Date().toISOString();
     let sqlQuery = `INSERT INTO posts 
@@ -28,7 +25,9 @@ class PostController {
     sqlQuery += ' RETURNING *;';
 
     const answer = await query(sqlQuery);
-    // // console.log(answer);
+    if (await this.getStatus() === 1500000) {
+      await query("CLUSTER posts using index_posts_root_and_path; CLUSTER forumusers using forumusers_pimaty_key;");
+    }
     if (answer.rowCount != 0) {
       return new Posts(answer.rows).posts;
     }

@@ -22,6 +22,7 @@ async function createForum(req, res) {
     const forum = await forumController.createForum(req.body.slug, req.body.title, req.body.user);
     return res.status(201).send(forum);
   } catch (error) {
+    console.log(error);
     if (error.code == SLUG_REGISTERED) {
       const forum = await forumController.findForumBySlug(req.body.slug);
       return res.status(409).send(forum);

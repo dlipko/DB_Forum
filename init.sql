@@ -125,13 +125,13 @@ BEGIN
   SET
     posts = posts + 1
   WHERE slug = NEW.forum;
-  RETURN NULL;
+  RETURN NEW;
 END;
 ' LANGUAGE plpgsql;
 
 
 CREATE TRIGGER on_post_insert_update_forums
-AFTER INSERT ON posts
+BEFORE INSERT ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_insert_update_forums();
 
 

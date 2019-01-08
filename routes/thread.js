@@ -16,6 +16,7 @@ class ThreadRouter {
 }
 
 async function createThread(req, res) {
+  try {
   const {
     slugOrId
   } = req.params;
@@ -32,7 +33,6 @@ async function createThread(req, res) {
     return res.status(201).send([]);
   }
   
-  try {
     const posts = await postController.createPosts(req.body, thread);
     if (posts.length) {
       return res.status(201).send(posts);
