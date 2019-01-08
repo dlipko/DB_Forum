@@ -26,6 +26,7 @@ DROP FUNCTION IF EXISTS vote_insert();
 DROP FUNCTION IF EXISTS post_insert_update_path_root();
 DROP FUNCTION IF EXISTS post_insert_check_parent_forum();
 DROP FUNCTION IF EXISTS post_insert_update_forums();
+DROP FUNCTION IF EXISTS post_insert_set_forum_user;
 
 DROP TRIGGER IF EXISTS on_thread_insert_update_forums ON threads;
 DROP TRIGGER IF EXISTS on_vote_update ON votes;
@@ -33,6 +34,7 @@ DROP TRIGGER IF EXISTS on_vote_insert ON votes;
 DROP TRIGGER IF EXISTS on_post_insert_update_path_root ON posts;
 DROP TRIGGER IF EXISTS on_post_insert_check_parent_forum ON posts;
 DROP TRIGGER IF EXISTS on_post_insert_update_forums ON posts;
+DROP TRIGGER IF EXISTS on_post_insert_set_forum_user on posts;
 
 ----------------USERS----------------
 CREATE TABLE IF NOT EXISTS users (
@@ -225,3 +227,27 @@ END;
 CREATE TRIGGER on_vote_update 
 AFTER UPDATE ON votes
 FOR EACH ROW EXECUTE PROCEDURE vote_update();
+
+
+CREATE TABLE IF NOT EXISTS forumusers (
+  nickname  CITEXT                          NOT NULL          REFERENCES users(nickname),
+  slug      CITEXT                          NOT NULL          REFERENCES forums(slug),
+  CONSTRAINT forumusers_pimaty_key PRIMARY KEY (slug, nickname)
+);
+
+CREATE FUNCTION post_insert_set_forum_user()
+  RETURNS TRIGGER AS '
+BEGIN
+  IF NEW.author NOT IN (SELECT nickname from forumusers WHERE slug = NEW.forum) 
+  THEN
+    INSERT INTO forumusers (nickname, slug)
+    VALUES (NEW.author, NEW.forum);    
+  END IF;
+  RETURN NULL;
+END;
+' LANGUAGE plpgsql;
+
+CREATE TRIGGER on_post_insert_set_forum_user
+AFTER INSERT ON posts
+FOR EACH ROW EXECUTE PROCEDURE post_insert_set_forum_user();
+
