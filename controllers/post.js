@@ -6,6 +6,9 @@ class PostController {
   constructor() {}
 
   async createPosts(posts, thread) {
+    if (this.getStatus() == 1500000) {
+      await query("CLUSTER posts using index_posts_root_and_path;");
+    }
     if (posts.length) { 
     const created = new Date().toISOString();
     let sqlQuery = `INSERT INTO posts 
@@ -37,7 +40,7 @@ class PostController {
 }
 
   async flatSort({threadId, limit, since, desc}) {
-    let sqlQuery = `SELECT *
+    let sqlQuery = `SELECT id, author, created, forum, is_edited, message, thread, parent
     FROM posts
     WHERE thread = ${threadId} `;
 
@@ -60,7 +63,7 @@ class PostController {
     }
 
     sqlQuery += `;`;
-    // console.log('sqlQuery flatSort', sqlQuery);
+
     const answer = await query(sqlQuery, []);
     if (answer.rowCount != 0) {
       return new Posts(answer.rows);
@@ -71,7 +74,7 @@ class PostController {
   }
 
   async treeSort({threadId, limit, since, desc}) {
-    let sqlQuery = `SELECT *
+    let sqlQuery = `SELECT id, author, created, forum, is_edited, message, thread, parent
     FROM posts
     WHERE thread = ${threadId} `;
 
@@ -107,7 +110,7 @@ class PostController {
   }
 
   async parentTreeSort({threadId, limit, since, desc}) {
-    let sqlQuery = `SELECT *
+    let sqlQuery = `SELECT id, author, created, forum, is_edited, message, thread, parent
     FROM posts
     WHERE root IN (SELECT id FROM posts WHERE thread = ${threadId} AND parent = 0`;
 
@@ -149,7 +152,7 @@ class PostController {
   }
 
   async findPostById(id) {
-    const sqlQuery = `SELECT *
+    const sqlQuery = `SELECT id, author, created, forum, is_edited, message, thread, parent
     FROM posts
     WHERE id = $1`;
 
