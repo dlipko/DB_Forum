@@ -20,8 +20,8 @@ class ForumController {
 
   async findForumBySlug(slug) {
     const sqlQuery = `SELECT *
-    FROM forums f
-    WHERE f.slug = $1`;
+    FROM forums
+    WHERE slug = $1`;
 
     const answer = await query(sqlQuery, [slug]);
     if (answer.rowCount != 0) {
@@ -40,6 +40,7 @@ class ForumController {
   }
 
   async getForumThreads(slug, limit, since, desc) {
+    console.time('getForumThreads');
     let sqlQuery = `SELECT *
     FROM threads
     WHERE forum = $1 `;
@@ -63,8 +64,8 @@ class ForumController {
 
 
     const answer = await query(sqlQuery, [slug, limit]);
-
     const newThreads = answer.rows.map(thread => new Thread(thread))
+    console.timeEnd('getForumThreads');
     return newThreads;
   }
 

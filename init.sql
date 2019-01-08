@@ -49,14 +49,14 @@ CREATE UNIQUE INDEX index_users_on_email    ON users (email);
 CREATE TABLE IF NOT EXISTS forums (
   id      BIGSERIAL                               PRIMARY KEY,
   posts   INT                          NOT NULL                 DEFAULT 0,
-  slug    CITEXT                       NOT NULL,
+  slug    CITEXT                       NOT NULL                             UNIQUE,
   threads INT                          NOT NULL                 DEFAULT 0,
   title   CITEXT                       NOT NULL,
   "user"  CITEXT                       NOT NULL                 REFERENCES users(nickname)
 );
 
 CREATE UNIQUE INDEX index_forum_on_slug   ON forums (slug);
-CREATE INDEX index_forum_on_user          ON forums ("user");
+-- CREATE INDEX index_forum_on_user          ON forums ("user");
 
 
 
@@ -108,10 +108,10 @@ CREATE TABLE IF NOT EXISTS posts (
 );
 
 CREATE INDEX index_posts_on_thread_and_id           ON posts (thread, id);
-CREATE INDEX index_posts_on_parent                  ON posts (parent);
+-- CREATE INDEX index_posts_on_parent                  ON posts (parent);
 CREATE INDEX index_posts_on_thread                  ON posts (thread);
-CREATE INDEX index_posts_thread_path_parent         ON posts (thread, parent, path);
-CREATE INDEX index_posts_on_thread_and_path_and_id  ON posts (thread, path ,id);
+CREATE INDEX index_posts_thread_path_parent         ON posts (thread, parent);
+CREATE INDEX index_posts_on_thread_and_path_and_id  ON posts (thread, path);
 
 
 CREATE FUNCTION post_insert_update_forums()

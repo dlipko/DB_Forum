@@ -103,6 +103,7 @@ async function getThreads(req, res) {
 };
 
 async function getUsers(req, res) {
+  try {
   const {
     slug
   } = req.params;
@@ -112,8 +113,7 @@ async function getUsers(req, res) {
     since,
     desc,
   } = req.query;
-  
-  try {
+
     const forumIsExist = await forumController.isExist(slug);
     if (!forumIsExist) {
       return res.status(404).send({
