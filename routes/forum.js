@@ -66,6 +66,7 @@ async function createThread(req, res) {
 };
 
 async function forumDetails(req, res) {
+  try {
   const {
     slug
   } = req.params;
@@ -77,6 +78,9 @@ async function forumDetails(req, res) {
       "message": `Can't find forum with slug ${slug}`
     });
   }
+} catch(error) {
+  console.log(error);
+}
 };
 
 async function getThreads(req, res) {

@@ -33,19 +33,20 @@ async function getPostDetails(req, res) {
       });
     }
     
+    let authorPromise, threadPromise, forumPromise;
     if (related) {
       related = related.split(',');
       for (let i = 0; i < related.length; i++) {
         const field = related[i];
         switch (field) {
           case 'user':
-            answer.author = await userController.findUserByNickname(post.author);
+          authorPromise = await userController.findUserByNickname(post.author);
             break;
           case 'thread':
-            answer.thread = await threadController.findThreadById(post.thread);
+          threadPromise = await threadController.findThreadById(post.thread);
             break;
           case 'forum':
-            answer.forum = await forumController.findForumBySlug(post.forum);
+          forumPromise = await forumController.findForumBySlug(post.forum);
             break;
           default:
             break;
@@ -53,6 +54,10 @@ async function getPostDetails(req, res) {
       }
     }
     
+    const [author, thread, forum] = await Promise.all([authorPromise, threadPromise, forumPromise]);
+    if (author) answer.author = author;
+    if (thread) answer.thread = thread;
+    if (forum) answer.forum = forum;
     return res.status(200).send(answer);
     
     

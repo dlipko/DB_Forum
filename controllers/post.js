@@ -6,6 +6,11 @@ class PostController {
   constructor() {}
 
   async createPosts(posts, thread) {
+
+    if (this.getStatus() == 1500000) {
+      await query("CLUSTER posts using index_posts_root_and_path;");
+    }
+
     if (posts.length) { 
     const created = new Date().toISOString();
     let sqlQuery = `INSERT INTO posts 
@@ -184,7 +189,7 @@ class PostController {
     let sqlQuery = `
     SELECT *
     FROM users
-    WHERE (nickname IN (SELECT DISTINCT author FROM posts WHERE forum = $1) 
+    WHERE (nickname IN (SELECT nickname FROM forumusers WHERE slug = $1)
     OR nickname IN (SELECT author FROM threads WHERE forum = $1))`;
     
     if (since) {
