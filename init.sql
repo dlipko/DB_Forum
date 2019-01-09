@@ -108,51 +108,30 @@ CREATE TABLE IF NOT EXISTS posts (
   thread BIGINT                         NOT NULL
 );
 
-
--- CREATE INDEX index_posts_on_thread_and_id           ON posts (thread, id);
--- CREATE INDEX index_posts_on_parent                  ON posts (parent);
--- CREATE INDEX index_posts_on_thread                  ON posts (thread);
--- CREATE INDEX index_posts_thread_path_parent         ON posts (thread, parent);
--- CREATE INDEX index_posts_root_and_path              ON posts(root, path);
--- CREATE INDEX index_posts_on_thread_and_path_and_id  ON posts (thread, path);
-
-
--- CREATE FUNCTION post_insert_update_forums()
---   RETURNS TRIGGER AS '
--- BEGIN
---   UPDATE forums
---   SET
---     posts = posts + 1
---   WHERE slug = NEW.forum;
---   RETURN NEW;
--- END;
--- ' LANGUAGE plpgsql;
+CREATE INDEX index_posts_on_id           ON posts (id);
+CREATE INDEX index_posts_on_thread_and_id           ON posts (thread, id);
+CREATE INDEX index_posts_on_parent                  ON posts (parent);
+CREATE INDEX index_posts_on_thread                  ON posts (thread);
+CREATE INDEX index_posts_thread_path_parent         ON posts (thread, parent);
+CREATE INDEX index_posts_root_and_path              ON posts(root, path);
+CREATE INDEX index_posts_on_thread_and_path_and_id  ON posts (thread, path);
 
 
--- CREATE TRIGGER on_post_insert_update_forums
--- BEFORE INSERT ON posts
--- FOR EACH ROW EXECUTE PROCEDURE post_insert_update_forums();
+CREATE FUNCTION post_insert_update_forums()
+  RETURNS TRIGGER AS '
+BEGIN
+  UPDATE forums
+  SET
+    posts = posts + 1
+  WHERE slug = NEW.forum;
+  RETURN NULL;
+END;
+' LANGUAGE plpgsql;
 
+CREATE TRIGGER on_post_insert_update_forums
+AFTER INSERT ON posts
+FOR EACH ROW EXECUTE PROCEDURE post_insert_update_forums();
 
--- CREATE FUNCTION post_insert_check_parent_forum()
---   RETURNS TRIGGER AS '
--- BEGIN
---   IF NEW.parent != 0 
---   THEN
---     IF NEW.forum = (SELECT forum FROM posts WHERE id = NEW.parent) 
---     THEN
---       return NEW;
---     ELSE
---       RAISE division_by_zero;
---     END IF;
---   END IF;
---   RETURN NEW;
--- END;
--- ' LANGUAGE plpgsql;
-
--- CREATE TRIGGER on_post_insert_check_parent_forum
--- BEFORE INSERT ON posts
--- FOR EACH ROW EXECUTE PROCEDURE post_insert_check_parent_forum();
 
 
 CREATE OR REPLACE FUNCTION post_insert_update_path_root()
@@ -162,12 +141,7 @@ DECLARE
     parent_path BIGINT [];
 BEGIN
 
-  UPDATE forums
-  SET
-    posts = posts + 1
-  WHERE slug = NEW.forum;
-
-  SELECT root, path INTO parent_root, parent_path
+  SELECT forum, root, path INTO parent_root, parent_path
   FROM posts 
   WHERE id = NEW.parent;
 
@@ -178,17 +152,6 @@ BEGIN
   END IF;
 
   NEW.path = array_append(parent_path, NEW.id);
-
-
-  IF NEW.parent != 0 
-  THEN
-    IF NEW.forum = (SELECT forum FROM posts WHERE id = NEW.parent) 
-    THEN
-      return NEW;
-    ELSE
-      RAISE division_by_zero;
-    END IF;
-  END IF;
 
   RETURN NEW;
 END;

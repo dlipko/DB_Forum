@@ -42,8 +42,8 @@ async function createThread(req, res) {
       });
     }
   } catch (error) {
-    // console.log('createThread', error);
-    if (error.code === '23502') {
+    console.log('createThread', error);
+    if (error.code === '23502' && error.column != 'forum') {
       return res.status(404).send({
         message: `Can't find post author by nickname:`,
       });

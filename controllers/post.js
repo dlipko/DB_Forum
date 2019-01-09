@@ -13,20 +13,23 @@ class PostController {
       posts.forEach((post) => {
         let parent;
         if (!post.parent) {
-          post.parent = 0;
+          sqlQuery += `((SELECT nickname FROM users WHERE nickname = '${post.author}'),
+          (SELECT slug FROM forums WHERE slug = '${thread.getForum()}'), FALSE, '${post.message}', 
+          0, ${thread.getId()}),`;
+        } else {
+          sqlQuery += `((SELECT nickname FROM users WHERE nickname = '${post.author}'),
+          (SELECT forum FROM posts WHERE id = ${post.parent} AND forum = '${thread.getForum()}'), FALSE, '${post.message}', 
+          ${post.parent}, ${thread.getId()}),`;
         }
-        sqlQuery += `((SELECT nickname FROM users WHERE nickname = '${post.author}'),
-        (SELECT slug FROM forums WHERE slug = '${thread.getForum()}'), FALSE, '${post.message}', 
-        ${post.parent}, ${thread.getId()}),`;
       });
 
-    sqlQuery = sqlQuery.substring(0, sqlQuery.length - 1);
+    sqlQuery = sqlQuery.slice(0, - 1);
     sqlQuery += ' RETURNING *;';
 
     const answer = await query(sqlQuery);
-    if (await this.getStatus() === 1500000) {
-      await query("CLUSTER posts using index_posts_root_and_path;");
-    }
+    // if (await this.getStatus() === 1500000) {
+    //   await query("CLUSTER posts using index_posts_root_and_path;");
+    // }
     if (answer.rowCount != 0) {
       return new Posts(answer.rows).posts;
     }
