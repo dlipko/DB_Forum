@@ -126,13 +126,13 @@ BEGIN
   SET
     posts = posts + 1
   WHERE slug = NEW.forum;
-  RETURN NULL;
+  RETURN NEW;
 END;
 ' LANGUAGE plpgsql;
 
 
 CREATE TRIGGER on_post_insert_update_forums
-AFTER INSERT ON posts
+BEFORE INSERT ON posts
 FOR EACH ROW EXECUTE PROCEDURE post_insert_update_forums();
 
 
@@ -239,24 +239,24 @@ FOR EACH ROW EXECUTE PROCEDURE vote_update();
 
 
 
-CREATE TABLE IF NOT EXISTS forumusers (
-  nickname  CITEXT                          NOT NULL          REFERENCES users(nickname),
-  slug      CITEXT                          NOT NULL          REFERENCES forums(slug),
-  CONSTRAINT forumusers_pimaty_key PRIMARY KEY (slug, nickname)
-);
+-- CREATE TABLE IF NOT EXISTS forumusers (
+--   nickname  CITEXT                          NOT NULL          REFERENCES users(nickname),
+--   slug      CITEXT                          NOT NULL          REFERENCES forums(slug),
+--   CONSTRAINT forumusers_pimaty_key PRIMARY KEY (slug, nickname)
+-- );
 
-CREATE FUNCTION post_insert_set_forum_user()
-  RETURNS TRIGGER AS '
-BEGIN
-  IF NEW.author NOT IN (SELECT nickname from forumusers WHERE slug = NEW.forum) 
-  THEN
-    INSERT INTO forumusers (nickname, slug)
-    VALUES (NEW.author, NEW.forum);    
-  END IF;
-  RETURN NULL;
-END;
-' LANGUAGE plpgsql;
+-- CREATE FUNCTION post_insert_set_forum_user()
+--   RETURNS TRIGGER AS '
+-- BEGIN
+--   IF NEW.author NOT IN (SELECT nickname from forumusers WHERE slug = NEW.forum) 
+--   THEN
+--     INSERT INTO forumusers (nickname, slug)
+--     VALUES (NEW.author, NEW.forum);    
+--   END IF;
+--   RETURN NULL;
+-- END;
+-- ' LANGUAGE plpgsql;
 
-CREATE TRIGGER on_post_insert_set_forum_user
-AFTER INSERT ON posts
-FOR EACH ROW EXECUTE PROCEDURE post_insert_set_forum_user();
+-- CREATE TRIGGER on_post_insert_set_forum_user
+-- AFTER INSERT ON posts
+-- FOR EACH ROW EXECUTE PROCEDURE post_insert_set_forum_user();

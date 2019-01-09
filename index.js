@@ -5,12 +5,12 @@ const start = require('./db/start');
 
 start();
 
-const fastify = require('fastify')({
+// const fastify = require('fastify')({
   logger: false,
 });
 
 
-// fastify.use(morgan('dev'));
+fastify.use(morgan('dev'));
 
 // EMPTY BODY
 if (!fastify.hasContentTypeParser('application/json')) {
