@@ -4,7 +4,7 @@ const cluster = require('cluster');
 
 const morgan  = require('morgan');
 
-// start();
+start();
 
 
 const fastify = require('fastify');

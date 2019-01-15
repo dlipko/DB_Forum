@@ -16,7 +16,7 @@ DROP INDEX IF EXISTS index_posts_thread_path_parent;
 DROP INDEX IF EXISTS index_posts_on_thread;
 DROP INDEX IF EXISTS index_posts_on_parent;
 DROP INDEX IF EXISTS index_posts_on_thread_and_id;
-DROP INDEX IF EXISTS index_posts_on_root_and_path_and_forum
+DROP INDEX IF EXISTS index_posts_on_root_and_path_and_forum;
 DROP INDEX IF EXISTS index_threads_on_forum;
 DROP INDEX IF EXISTS index_votes_on_nickname_and_thread;
 
