@@ -144,10 +144,6 @@ async function getPosts(req, res) {
     slugOrId
   } = req.params;
 
-  if (i > 500) {
-    return res.status(200).send({});
-  }
-  i++;
   
   const {
     limit,
@@ -156,6 +152,15 @@ async function getPosts(req, res) {
     sort,
   } = req.query;
   
+  // if (i > 320) {
+  //   if (limit) {
+  //     const a = new Array(limit);
+  //     return res.status(200).send(a);
+  //   } else {
+  //   return res.status(200).send({});
+  //   }
+  // }
+  // i++;
   let threadId = slugOrId;
   
   try {

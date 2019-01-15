@@ -4,7 +4,6 @@ const postController = require('../controllers/post');
 
 const Thread = require('../models/thread');
 
-
 class ForumRouter {
   constructor(url, app) {
     app.post(`${url}/create`, createForum);
@@ -112,26 +111,32 @@ async function getUsers(req, res) {
     slug
   } = req.params;
   
+  
   const {
     limit,
     since,
     desc,
   } = req.query;
-
-    const forumIsExist = await forumController.isExist(slug);
+    
+  
+  const users =  await postController.getUsers({
+    slug,
+    limit,
+    since,
+    desc
+  });
+  
+  let forumIsExist = true;
+  if (!users) {
+    forumIsExist =  await forumController.isExist(slug);
+  }
+    
     if (!forumIsExist) {
       return res.status(404).send({
         "message": "Can't find forum by slug: 03I9V4x1eoKo8"
       });
     }
-    
-    users = await postController.getUsers({
-      slug,
-      limit,
-      since,
-      desc
-    });
-    
+
     if (users) {
       return res.status(200).send(users);
     } else {
@@ -139,7 +144,7 @@ async function getUsers(req, res) {
     }
     
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     return res.status(404).send({
       "message": "Can't find forum by slug: 03I9V4x1eoKo8"
     });
