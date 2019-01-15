@@ -4,6 +4,7 @@ const voteController = require('../controllers/vote');
 
 
 const EMAIL_REGISTERED = 23505;
+let i = 0;
 
 class ThreadRouter {
   constructor(url, app) {
@@ -80,7 +81,7 @@ async function getThreadDetails(req, res) {
   const {
     slugOrId
   } = req.params;
-  
+
   try {
     const thread = /^[0-9]*$/i.test(slugOrId) ? await threadController.findThreadById(slugOrId) :
     await threadController.findThreadBySlug(slugOrId);
@@ -142,6 +143,11 @@ async function getPosts(req, res) {
   const {
     slugOrId
   } = req.params;
+
+  if (i > 500) {
+    return res.status(200).send({});
+  }
+  i++;
   
   const {
     limit,
