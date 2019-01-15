@@ -6,11 +6,6 @@ class PostController {
   constructor() {}
 
   async createPosts(posts, thread) {
-
-    if (this.getStatus() == 1500000) {
-      await query("CLUSTER posts using index_posts_root_and_path;");
-    }
-
     if (posts.length) { 
     const created = new Date().toISOString();
     let sqlQuery = `INSERT INTO posts 
