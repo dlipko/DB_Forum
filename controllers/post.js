@@ -55,9 +55,10 @@ class PostController {
       sqlQuery += ` ORDER BY id ASC `;
     }
 
-    if (limit) {
-      sqlQuery += ` LIMIT ${limit}`;
+    if (!limit) {
+      limit = 100;
     }
+    sqlQuery += ` LIMIT ${limit}`;
 
     sqlQuery += `;`;
     // console.log('sqlQuery flatSort', sqlQuery);
@@ -91,10 +92,12 @@ class PostController {
 			sqlQuery += ` DESC `;
 		}
 
-    if (limit) {
-      sqlQuery += ` LIMIT ${limit}`;
+    if (!limit) {
+      limit = 100;
     }
 
+    sqlQuery += ` LIMIT ${limit}`;
+    
     sqlQuery += `;`;
 
     const answer = await query(sqlQuery, []);
@@ -127,9 +130,11 @@ class PostController {
 			sqlQuery += ` DESC `;
     }
     
-    if (limit) {
-      sqlQuery += ` LIMIT ${limit}) `;
+    if (!limit) {
+      limit = 100;
     }
+
+    sqlQuery += ` LIMIT ${limit}) `;
 	
 		if (desc === 'true') {
 			sqlQuery += ` ORDER BY root DESC, path `;
