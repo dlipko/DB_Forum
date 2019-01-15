@@ -214,9 +214,10 @@ class PostController {
 			sqlQuery += ` DESC `;
     }
     
-    if (limit) {
-      sqlQuery += ` LIMIT  ${limit} `;
+    if (!limit) {
+      limit = 10;
     }
+    sqlQuery += ` LIMIT  ${limit} `;
 
     sqlQuery += `;`;
 
