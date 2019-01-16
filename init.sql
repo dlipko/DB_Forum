@@ -128,7 +128,8 @@ CREATE TABLE IF NOT EXISTS posts (
 CREATE INDEX index_posts_on_id                      ON posts (id);
 CREATE INDEX index_posts_on_author                  ON posts (author);
 CREATE INDEX index_posts_on_thread                  ON posts (thread);
-
+CREATE INDEX index_posts_on_root                    ON posts (root);
+CREATE INDEX index_posts_on_thread_and_parent       ON posts (thread, parent);
 
 -- CREATE FUNCTION post_insert_update_forums()
 --   RETURNS TRIGGER AS '
@@ -181,6 +182,10 @@ BEGIN
   FROM posts 
   WHERE id = NEW.parent;
 
+  UPDATE forums
+  SET
+    posts = posts + 1
+  WHERE slug = NEW.forum;
 
   IF NEW.parent != 0 
   THEN
@@ -196,13 +201,6 @@ BEGIN
   INSERT INTO forumusers (nickname, forum)
     VALUES (NEW.author, NEW.forum)
     ON CONFLICT DO NOTHING;
-
-
-  UPDATE forums
-  SET
-    posts = posts + 1
-  WHERE slug = NEW.forum;
-
 
   NEW.path = array_append(parent_path, NEW.id);
 

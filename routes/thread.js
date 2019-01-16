@@ -44,7 +44,7 @@ async function createThread(req, res) {
       });
     }
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     // console.log('ERROR CODE', error.code);
     if (error.code === '23502' && error.column != 'root') {
       return res.status(404).send({
