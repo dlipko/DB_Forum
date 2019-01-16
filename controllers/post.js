@@ -196,19 +196,19 @@ class PostController {
     let sqlQuery = `
     SELECT *
     FROM users
-    WHERE (nickname IN (SELECT DISTINCT author FROM posts WHERE forum = $1) 
-    OR nickname IN (SELECT author FROM threads WHERE forum = $1))`;
+    WHERE nickname IN (SELECT author FROM posts WHERE forum = $1) `;
+    // OR nickname IN (SELECT author FROM threads WHERE forum = $1))`;
 
     
     if (since) {
 			if (desc === 'true') {
-				sqlQuery += ` AND nickname < '${since}'`;
+				sqlQuery += ` AND nickname < '${since}' COLLATE "C" `;
 			} else {
-				sqlQuery += ` AND nickname > '${since}'`;
+				sqlQuery += ` AND nickname > '${since}' COLLATE "C" `;
 			}
     }
 
-    sqlQuery += ` ORDER BY nickname `;
+    sqlQuery += ` ORDER BY nickname COLLATE "C" `;
 
 		if (desc === 'true') {
 			sqlQuery += ` DESC `;

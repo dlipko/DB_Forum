@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS votes CASCADE;
 
 DROP INDEX IF EXISTS index_users_on_nickname;
 DROP INDEX IF EXISTS index_users_on_email;
+DROP INDEX IF EXISTS index_on_users_nickname_collate;
 DROP INDEX IF EXISTS index_forum_on_slug;
 DROP INDEX IF EXISTS index_forum_on_user;
 DROP INDEX IF EXISTS index_threads_on_slug;
@@ -16,7 +17,9 @@ DROP INDEX IF EXISTS index_posts_thread_path_parent;
 DROP INDEX IF EXISTS index_posts_on_thread;
 DROP INDEX IF EXISTS index_posts_on_parent;
 DROP INDEX IF EXISTS index_posts_on_thread_and_id;
+DROP INDEX IF EXISTS index_posts_on_id;
 DROP INDEX IF EXISTS index_posts_on_root_and_path_and_forum;
+DROP INDEX IF EXISTS index_posts_on_author;
 DROP INDEX IF EXISTS index_threads_on_forum;
 DROP INDEX IF EXISTS index_votes_on_nickname_and_thread;
 
@@ -49,6 +52,8 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE UNIQUE INDEX index_users_on_nickname ON users (nickname);
 CREATE UNIQUE INDEX index_users_on_email    ON users (email);
+CREATE UNIQUE INDEX index_on_users_nickname_collate
+  ON "users" (nickname COLLATE "C");
 
 
 ----------------FORUMS----------------
@@ -62,7 +67,6 @@ CREATE TABLE IF NOT EXISTS forums (
 );
 
 CREATE UNIQUE INDEX index_forum_on_slug   ON forums (slug);
--- CREATE INDEX index_forum_on_user          ON forums ("user");
 
 
 
@@ -113,12 +117,9 @@ CREATE TABLE IF NOT EXISTS posts (
   thread BIGINT                         NOT NULL
 );
 
-CREATE INDEX index_posts_on_thread_and_id           ON posts (thread, id);
--- CREATE INDEX index_posts_on_parent                  ON posts (parent);
+CREATE INDEX index_posts_on_id                      ON posts (id);
+CREATE INDEX index_posts_on_author                  ON posts (author);
 CREATE INDEX index_posts_on_thread                  ON posts (thread);
-CREATE INDEX index_posts_thread_path_parent         ON posts (thread, parent);
-CREATE INDEX index_posts_on_thread_and_path_and_id  ON posts (thread, path);
-CREATE INDEX index_posts_on_root_and_path_and_forum  ON posts (root, path, forum);
 
 
 -- CREATE FUNCTION post_insert_update_forums()
