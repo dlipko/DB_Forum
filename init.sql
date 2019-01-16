@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS forums CASCADE;
 DROP TABLE IF EXISTS threads CASCADE;
 DROP TABLE IF EXISTS posts CASCADE;
 DROP TABLE IF EXISTS votes CASCADE;
+DROP TABLE IF EXISTS forumusers CASCADE;
 
 DROP INDEX IF EXISTS index_users_on_nickname;
 DROP INDEX IF EXISTS index_users_on_email;
@@ -22,6 +23,8 @@ DROP INDEX IF EXISTS index_posts_on_root_and_path_and_forum;
 DROP INDEX IF EXISTS index_posts_on_author;
 DROP INDEX IF EXISTS index_threads_on_forum;
 DROP INDEX IF EXISTS index_votes_on_nickname_and_thread;
+
+DROP INDEX IF EXISTS index_forumuser_forum;
 
 DROP FUNCTION IF EXISTS thread_insert_update_forums();
 DROP FUNCTION IF EXISTS vote_update();
@@ -92,6 +95,11 @@ BEGIN
   SET
     threads = threads + 1
   WHERE slug = NEW.forum;
+
+  INSERT INTO forumusers (nickname, forum)
+    VALUES (NEW.author, NEW.forum)
+    ON CONFLICT DO NOTHING;
+
   RETURN NULL;
 END;
 ' LANGUAGE plpgsql;
@@ -185,6 +193,10 @@ BEGIN
     NEW.root = NEW.id;
   END IF;
 
+  INSERT INTO forumusers (nickname, forum)
+    VALUES (NEW.author, NEW.forum)
+    ON CONFLICT DO NOTHING;
+
 
   UPDATE forums
   SET
@@ -252,17 +264,13 @@ FOR EACH ROW EXECUTE PROCEDURE vote_update();
 
 
 
+CREATE TABLE IF NOT EXISTS forumusers (
+  nickname  CITEXT                          NOT NULL          REFERENCES users(nickname),
+  forum      CITEXT                          NOT NULL          REFERENCES forums(slug),
+  CONSTRAINT forumusers_pimaty_key PRIMARY KEY (nickname, forum)
+);
 
-
-
-
-
-
--- CREATE TABLE IF NOT EXISTS forumusers (
---   nickname  CITEXT                          NOT NULL          REFERENCES users(nickname),
---   slug      CITEXT                          NOT NULL          REFERENCES forums(slug),
---   CONSTRAINT forumusers_pimaty_key PRIMARY KEY (slug, nickname)
--- );
+CREATE INDEX index_forumuser_forum    ON posts (forum);
 
 -- CREATE FUNCTION post_insert_set_forum_user()
 --   RETURNS TRIGGER AS '
