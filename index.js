@@ -48,7 +48,7 @@ const setUpFastify = () => {
   const service = fastify({
     logger: false,
   });
-  service.use(morgan('dev'));
+  // service.use(morgan('dev'));
   service.addContentTypeParser(
     'application/json', {
       parseAs: 'buffer'
